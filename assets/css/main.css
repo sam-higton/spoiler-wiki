@@ -1,0 +1,89 @@
+
+
+.navbar-brand {
+    font-size: 25px;
+}
+
+.navbar-header .wiki {
+    float: left;
+    padding-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.navbar-header .wiki .canon {
+    font-size: 18px;
+}
+
+.navbar-header .wiki .position {
+    font-size: 13px;
+    margin-top: -4px;
+    font-style: italic;
+}
+
+.navbar-brand .canon {
+    font-size: 18px;
+}
+
+.content {
+    padding-top: 100px;
+}
+
+.modal-content-wrapper {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.series-select .dropdown-menu {
+    width: 100%;
+}
+
+.series-select .dropdown-menu li {
+    font-size: 170%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.series-select .dropdown-menu li strong {
+    /*background: lemonchiffon;   */
+}
+
+.progress-form {
+    display: none;
+}
+
+.wiki-cta {
+    display: none;
+    margin-top: 40px;
+}
+
+.artist {
+    font-style: italic;
+}
+
+.search-form {
+    margin-bottom: 55px;
+}
+
+.search-form h3 {
+    margin-bottom: 20px;
+}
+
+.search-result {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 19px;
+    margin-bottom: 30px;
+}
+
+.search-result h3 {
+    margin-bottom: 8px;
+}
+
+.search-result .meta {
+    margin-bottom: 6px;
+}
+
+.search-result .meta .type {
+    font-style: italic;
+}

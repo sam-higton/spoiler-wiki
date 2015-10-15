@@ -1,0 +1,77 @@
+{% extends "layout.twig" %}
+{% block header %}
+{% endblock %}
+{% block content %}
+
+
+    <div class="well well-lg intro text-center">
+        <div class="row ">
+            <h2>Welcome to Spoiler Wiki</h2>
+            <p>for all of your spoiler-free searching needs. To get started, just select a series below</p>
+        </div>
+    </div>
+
+    <div class="row series-select">
+        <h3>Find a series</h3>
+        <form role="form">
+
+            <div class="form-group">
+                <label for="series"></label>
+                <select name="series" id="series" class="combobox input-lg form-control">
+                    <option></option>
+                    <option value="Star Wars">Star Wars</option>
+                    <option value="Lord of the Rings">Lord of the rings</option>
+                    <option value="Game of Thrones">Game of Thrones</option>
+                    <option value="Wheel of Time">Wheel of Time</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <div class="row progress-form">
+        <h3>How far have you got?</h3>
+        <div class="form">
+            <div class="form-group">
+                <label for="work">Book</label>
+                <select name="work" id="work" class="combobox input-large form-control">
+                    <option></option>
+                    <option value="Star Wars">Fellowship of the Ring</option>
+                    <option value="Lord of the Rings">Two Towers</option>
+                    <option value="Game of Thrones">Return of the King</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="milestone">Chapter</label>
+                <select name="milestone" id="milestone" class="combobox input-large form-control">
+                    <option></option>
+                    <option value="Star Wars">Prologue</option>
+                    <option value="Lord of the Rings">Chapter I</option>
+                    <option value="Game of Thrones">Chapter II</option>
+                    <option value="Game of Thrones">Chapter III</option>
+                    <option value="Game of Thrones">Chapter IV</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row wiki-cta text-center">
+        <a href="/series/1" class="btn btn-lg btn-success">Visit Wiki</a>
+    </div>
+
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.combobox').combobox({bsVersion: '3'});
+
+            $('#series').on('change', function () {
+                $('.progress-form').show();
+            });
+
+            $('#milestone').on('change', function () {
+                $('.wiki-cta').show();
+            });
+        });
+
+
+    </script>
+
+
+{% endblock %}

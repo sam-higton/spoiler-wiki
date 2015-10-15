@@ -1,0 +1,117 @@
+
+<html>
+<head>
+    {% block head %}
+        <title>{% block title %}Spoiler Wiki{% endblock %}</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta charset="UTF-8">
+        <!--libraries-->
+        <link type="text/css" rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css" />
+        <link type="text/css" rel="stylesheet" href="/assets/lib/bootstrap-combobox/css/bootstrap-combobox.css" />
+        <script src="/bower_components/jquery/dist/jquery.min.js" ></script>
+        <script src="/bower_components/jqueryui/jquery-ui.min.js"></script>
+        <script src="/bower_components/angularjs/angular.min.js" ></script>
+        <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js" ></script>
+        <script src="/assets/lib/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <!--end libraries-->
+
+        <link type="text/css" rel="stylesheet" href="/assets/css/main.css" />
+        {% block customIncludes %}
+        {% endblock %}
+    {% endblock %}
+</head>
+<body>
+{% block  header %}
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span class="navbar-brand" >Spoiler Wiki</span>
+                <div class="wiki">
+                    <div class="canon">Lord of the Rings </div>
+                    <div class="position">Two Towers - Chapter II</div>
+                </div>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class=""><a href="#" data-toggle="modal" data-target="#progress-modal">Update progress</a></li>
+                    <li class=""><a href="#">Select another series</a></li>
+                    {#<li class="dropdown">#}
+                        {#<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>#}
+                        {#<ul class="dropdown-menu">#}
+                            {#<li><a href="/">home</a></li>#}
+
+                        {#</ul>#}
+                    {#</li>#}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+
+                    <li class="active"><a href="./">Contribute! <span class="sr-only">(current)</span></a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+{% endblock %}
+{% block preContent %}
+{% endblock %}
+<div class="container content">
+    {% block content %}
+    {% endblock %}
+</div>
+{% block postContent %}
+{% endblock %}
+{% block footer %}
+
+{% endblock %}
+<div class="modal fade" id="progress-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">How far have you progressed?</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row modal-content-wrapper">
+
+                    <div class="form">
+                        <div class="form-group">
+                            <label for="work">Book</label>
+                            <select name="work" id="work" class="combobox input-large form-control">
+                                <option></option>
+                                <option value="Star Wars">Fellowship of the Ring</option>
+                                <option value="Lord of the Rings">Two Towers</option>
+                                <option value="Game of Thrones">Return of the King</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="milestone">Chapter</label>
+                            <select name="milestone" id="milestone" class="combobox input-large form-control">
+                                <option></option>
+                                <option value="Star Wars">Prologue</option>
+                                <option value="Lord of the Rings">Chapter I</option>
+                                <option value="Game of Thrones">Chapter II</option>
+                                <option value="Game of Thrones">Chapter III</option>
+                                <option value="Game of Thrones">Chapter IV</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% block bodyEnd %}
+{% endblock %}
+</body>
+</html>

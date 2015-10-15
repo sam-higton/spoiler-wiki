@@ -1,0 +1,56 @@
+{% extends "layout.twig" %}
+{% block content %}
+    <div class="well well-lg intro text-center">
+        <div class="row ">
+            <h2>Lord of the Rings</h2>
+            <h4 class="artist">By <a href="#">J. R. R. Tolkien</a> </h4>
+            <p>The Lord of the Rings is an epic high-fantasy novel written by English author J. R. R. Tolkien. The story began as a sequel to Tolkien's 1937 fantasy novel The Hobbit, but eventually developed into a much larger work. Written in stages between 1937 and 1949, The Lord of the Rings is one of the best-selling novels ever written, with over 150 million copies sold.</p>
+        </div>
+    </div>
+
+    <div class="row search-form">
+        <h3>Available Articles</h3>
+        <div class="input-group input-group-lg">
+            <input type="text" class="form-control" placeholder="filter...">
+              <span class="input-group-btn">
+                <button class="btn btn-primary" type="button">Filter</button>
+              </span>
+        </div>
+    </div>
+    <div class="search-results">
+        <div class="search-result">
+            <h3><a href="#">Gandalf</a></h3>
+            <div class="row meta small">
+                <div class="col-md-1 type">character</div>
+                <div class="col-md-11 milestone">introduced at: <a href="#">Fellowship of the Ring</a> > <a href="#">Chapter I</a></div>
+            </div>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur elit ut lorem pellentesque vestibulum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed elit sem, efficitur in pharetra et, pharetra ac magna. Proin dictum sapien et libero cons
+            </p>
+        </div>
+
+        <div class="hr-line-dashed"></div>
+        <div class="search-result">
+            <h3><a href="#">Frodo</a></h3>
+            <div class="row meta small">
+                <div class="col-md-1 type">character</div>
+                <div class="col-md-11 milestone">introduced at: <a href="#">Fellowship of the Ring</a> > <a href="#">Chapter I</a></div>
+            </div>
+            <p>
+                Vestibulum vulputate, mauris non congue sodales, metus libero mattis dolor, quis vehicula tortor diam id metus. Aenean dapibus diam in luctus imperdiet.
+            </p>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="search-result">
+            <h3><a href="#">Rivendell</a></h3>
+            <div class="row meta small">
+                <div class="col-md-1 type">location</div>
+                <div class="col-md-11 milestone">introduced at: <a href="#">Fellowship of the Ring</a> > <a href="#">Chapter I</a></div>
+            </div>
+            <p>
+                Nam risus dolor, porttitor vitae fringilla et, lobortis vitae turpis.
+            </p>
+        </div>
+        <div class="hr-line-dashed"></div>
+    </div>
+{% endblock %}
