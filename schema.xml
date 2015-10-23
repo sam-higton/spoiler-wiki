@@ -1,0 +1,46 @@
+<database name="spoilerwiki" defaultIdMethod="native">
+    <table name="artist" phpName="Artist">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="255" required="true" />
+        <column name="bio" type="longvarchar" required="false" />
+    </table>
+    <table name="canon" phpName="Canon">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="255" required="true" />
+        <column name="description" type="longvarchar" required="false" />
+
+        <!--foreign keys -->
+        <foreign-key foreignTable="artist" phpName="PrimaryArtist">
+            <reference local="primary_artist_id" foreign="id" />
+        </foreign-key>
+    </table>
+    <table name="work" phpName="Work">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="255" required="true" />
+        <column name="description" type="longvarchar" required="false" />
+        <column name="order" type="integer" required="true" defaultValue="0" />
+
+        <!-- foreign keys -->
+
+    </table>
+    <table name="work_type" phpName="WorkType">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+
+    </table>
+    <table name="milestone" phpName="Milestone">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+
+    </table>
+    <table name="topic" phpName="Topic">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+
+    </table>
+    <table name="snippet" phpName="Snippet">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+
+    </table>
+    <table name="summary" phpName="Summary">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+
+    </table>
+</database>
