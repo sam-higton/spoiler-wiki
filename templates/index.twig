@@ -19,10 +19,9 @@
                 <label for="series"></label>
                 <select name="series" id="series" class="combobox input-lg form-control">
                     <option></option>
-                    <option value="Star Wars">Star Wars</option>
-                    <option value="Lord of the Rings">Lord of the rings</option>
-                    <option value="Game of Thrones">Game of Thrones</option>
-                    <option value="Wheel of Time">Wheel of Time</option>
+                    {% for canon in canonList %}
+                        <option value="{{ canon.id }}">{{ canon.name }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </form>

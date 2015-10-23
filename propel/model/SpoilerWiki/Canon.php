@@ -16,5 +16,8 @@ use SpoilerWiki\Base\Canon as BaseCanon;
  */
 class Canon extends BaseCanon
 {
-
+    static function fetchAll () {
+        $canonList  = CanonQuery::create()->find();
+        return $canonList;
+    }
 }
