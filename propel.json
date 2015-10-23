@@ -3,7 +3,8 @@
     "paths": {
       "outputDir": "./propel/",
       "phpDir": "./propel/model/",
-      "sqlDir": "./propel/sql"
+      "sqlDir": "./propel/sql",
+      "phpConfDir": "./propel/conf"
     },
     "database": {
       "connections": {

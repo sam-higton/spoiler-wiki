@@ -1,5 +1,6 @@
 <?php
 require "vendor/autoload.php";
+require "propel/conf/config.php";
 
 $app = new \Slim\Slim(array(
     'view' => new \Slim\Views\Twig()
