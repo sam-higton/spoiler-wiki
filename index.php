@@ -13,4 +13,8 @@ $app->get('/series/:id', function ($seriesId) use ($app) {
     $app->view()->display('series.twig', array ());
 });
 
+$app->get('/topic/:id', function ($topicId) use ($app) {
+    $app->view()->display('topic.twig', array());
+});
+
 $app->run();
