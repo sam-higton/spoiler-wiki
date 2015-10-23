@@ -1,0 +1,28 @@
+{
+  "propel": {
+    "paths": {
+      "outputDir": "./propel/",
+      "phpDir": "./propel/model/",
+      "sqlDir": "./propel/sql"
+    },
+    "database": {
+      "connections": {
+        "spoilerwiki": {
+          "adapter": "mysql",
+          "dsn": "mysql:host=localhost;dbname=spoilerwiki",
+          "user": "root",
+          "password": "",
+          "attributes": []
+        }
+      }
+    },
+    "runtime": {
+      "defaultConnection": "spoilerwiki",
+      "connections": ["spoilerwiki"]
+    },
+    "generator": {
+      "defaultConnection": "spoilerwiki",
+      "connections": ["spoilerwiki"]
+    }
+  }
+}

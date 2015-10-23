@@ -4,5 +4,8 @@
         "propel/propel": "~2.0@dev",
         "twig/twig": "^1.22",
         "slim/views": "^0.1.3"
+    },
+    "autoload": {
+        "classmap": ["propel/model"]
     }
 }

@@ -1,4 +1,4 @@
-<database name="spoilerwiki" defaultIdMethod="native">
+<database name="spoilerwiki" defaultIdMethod="native" namespace="SpoilerWiki" identifierQuoting="true">
     <table name="artist" phpName="Artist">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true" />
@@ -8,6 +8,7 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true" />
         <column name="description" type="longvarchar" required="false" />
+        <column name="primary_artist_id" type="integer" required="true"  />
         <!--foreign keys -->
         <foreign-key foreignTable="artist" phpName="primaryArtist">
             <reference local="primary_artist_id" foreign="id" />
@@ -19,6 +20,9 @@
         <column name="name" type="varchar" size="255" required="true" />
         <column name="description" type="longvarchar" required="false" />
         <column name="order" type="integer" required="true" defaultValue="0" />
+        <column name="primary_artist_id" type="integer" required="true"  />
+        <column name="canon_id" type="integer" required="true"  />
+        <column name="work_type_id" type="integer" required="true"  />
         <!-- foreign keys -->
         <foreign-key foreignTable="artist" phpName="primaryArtist">
             <reference local="primary_artist_id" foreign="id" />
@@ -43,14 +47,17 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="order" type="integer" required="true" defaultValue="0" />
         <column name="label" type="varchar" require="false" />
+        <column name="work_id" type="integer" required="true"  />
         <!--foreign keys -->
         <foreign-key foreignTable="work" phpName="work">
-            <reference local="work_type_id" foreign="id" />
+            <reference local="work_id" foreign="id" />
         </foreign-key>
     </table>
     <table name="topic" phpName="Topic">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true" />
+        <column name="canon_id" type="integer" required="true"  />
+        <column name="introduced_at" type="integer" required="true"  />
         <!-- foreign keys -->
         <foreign-key foreignTable="canon" phpName="canon">
             <reference local="canon_id" foreign="id" />
@@ -62,6 +69,8 @@
     <table name="snippet" phpName="Snippet">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="content" type="longvarchar" requred="true" />
+        <column name="topic_id" type="integer" required="true"  />
+        <column name="introduced_at" type="integer" required="true"  />
         <!-- foreign keys -->
         <foreign-key foreignTable="topic" phpName="topic">
             <reference local="topic_id" foreign="id" />
@@ -73,6 +82,8 @@
     <table name="summary" phpName="Summary">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="content" type="longvarchar" required="true" />
+        <column name="topic_id" type="integer" required="true"  />
+        <column name="introduced_at" type="integer" required="true"  />
         <!-- foreign keys -->
         <foreign-key foreignTable="topic" phpName="topic">
             <reference local="topic_id" foreign="id" />
