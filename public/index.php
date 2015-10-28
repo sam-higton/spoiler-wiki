@@ -1,10 +1,12 @@
 <?php
-require "vendor/autoload.php";
-require "propel/conf/config.php";
+require "../vendor/autoload.php";
+require "../propel/conf/config.php";
 
 $app = new \Slim\Slim(array(
     'view' => new \Slim\Views\Twig()
 ));
+
+$app->view->setTemplatesDirectory('../templates');
 
 $app->get('/', function () use ($app) {
     $canonList = \SpoilerWiki\Canon::fetchAll();
@@ -43,6 +45,16 @@ $app->post('/api/generate-canon', function () use ($app) {
     $canon->setPrimaryArtistId($artistId);
     $canonId = $canon->save();
     echo "id: " . $canonId;
+});
+
+$app->post('/api-generate-work', function () use ($app) {
+    $name = $app->request->post('name');
+    $description = $app->request->post('description');
+    $order = $app->request->post('order');
+    $artistId = $app->request->post('artist_id');
+    $canonId = $app->request->post('artistId');
+    $workTypeId = $app->request->post('work_type_id');
+
 });
 
 $app->run();

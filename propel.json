@@ -8,22 +8,29 @@
     },
     "database": {
       "connections": {
-        "spoilerwiki": {
+        "spoilerwiki-local": {
           "adapter": "mysql",
-          "dsn": "mysql:host=localhost;dbname=spoilerwiki",
+          "dsn": "mysql:host=localhost;dbname=scotchbox",
           "user": "root",
-          "password": "",
+          "password": "root",
+          "attributes": []
+        },
+        "spoilerwiki-remote": {
+          "adapter": "mysql",
+          "dsn": "mysql:host=192.168.33.10;dbname=scotchbox",
+          "user": "root",
+          "password": "root",
           "attributes": []
         }
       }
     },
     "runtime": {
-      "defaultConnection": "spoilerwiki",
-      "connections": ["spoilerwiki"]
+      "defaultConnection": "spoilerwiki-local",
+      "connections": ["spoilerwiki-local","spoilerwiki-remote"]
     },
     "generator": {
-      "defaultConnection": "spoilerwiki",
-      "connections": ["spoilerwiki"]
+      "defaultConnection": "spoilerwiki-remote",
+      "connections": ["spoilerwiki-remote","spoilerwiki-local"]
     }
   }
 }

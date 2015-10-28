@@ -39,7 +39,7 @@ class WorkTableMap extends TableMap
     /**
      * The default database name for this class
      */
-    const DATABASE_NAME = 'spoilerwiki';
+    const DATABASE_NAME = 'spoilerwiki-local';
 
     /**
      * The table name for this class

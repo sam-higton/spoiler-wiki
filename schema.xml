@@ -1,4 +1,4 @@
-<database name="spoilerwiki" defaultIdMethod="native" namespace="SpoilerWiki" identifierQuoting="true">
+<database name="spoilerwiki-local" defaultIdMethod="native" namespace="SpoilerWiki" identifierQuoting="true">
     <table name="artist" phpName="Artist">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true" />

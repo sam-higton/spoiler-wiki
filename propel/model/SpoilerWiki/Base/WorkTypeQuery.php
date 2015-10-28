@@ -85,7 +85,7 @@ abstract class WorkTypeQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'spoilerwiki', $modelName = '\\SpoilerWiki\\WorkType', $modelAlias = null)
+    public function __construct($dbName = 'spoilerwiki-local', $modelName = '\\SpoilerWiki\\WorkType', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
