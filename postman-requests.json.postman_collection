@@ -1,0 +1,131 @@
+{
+	"id": "a36349b5-56b9-edc5-2081-7ed899c1f9d3",
+	"name": "Spoiler Wiki",
+	"description": "Spoiler Wiki api calls",
+	"order": [
+		"c2a915a9-ba2c-0cdd-282e-db4e9a914ca3",
+		"fc665ef5-10b6-0c54-48b1-a57256fb2f5e",
+		"d2785b02-e0c3-fed3-6e7f-7aad22bc7688"
+	],
+	"folders": [],
+	"timestamp": 0,
+	"owner": "123553",
+	"remoteLink": null,
+	"public": false,
+	"requests": [
+		{
+			"folder": null,
+			"id": "c2a915a9-ba2c-0cdd-282e-db4e9a914ca3",
+			"name": "Generate Artist",
+			"dataMode": "params",
+			"data": [
+				{
+					"key": "name",
+					"value": "Mr A.U. Ther",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "bio",
+					"value": "writes books about stuff",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"rawModeData": null,
+			"descriptionFormat": "html",
+			"description": "",
+			"headers": "",
+			"method": "POST",
+			"pathVariables": {},
+			"url": "http://spoiler-wiki/api/generate-artist",
+			"preRequestScript": "",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"collectionId": "a36349b5-56b9-edc5-2081-7ed899c1f9d3"
+		},
+		{
+			"id": "d2785b02-e0c3-fed3-6e7f-7aad22bc7688",
+			"headers": "",
+			"url": "http://spoiler-wiki/api/generate-work-type",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "POST",
+			"collectionId": "a36349b5-56b9-edc5-2081-7ed899c1f9d3",
+			"data": [
+				{
+					"key": "name",
+					"value": "novel",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "work_label",
+					"value": "book",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "milestone_label",
+					"value": "chapter",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"name": "Generate Work Type",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1446129049951,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"id": "fc665ef5-10b6-0c54-48b1-a57256fb2f5e",
+			"headers": "",
+			"url": "http://spoiler-wiki/api/generate-canon",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "name",
+					"value": "Magical Fantasy Land",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "description",
+					"value": "A fantasy series",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "artist_id",
+					"value": "1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "work_type_id",
+					"value": "1",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1446131845427,
+			"name": "Generate Canon",
+			"description": "",
+			"collectionId": "a36349b5-56b9-edc5-2081-7ed899c1f9d3"
+		}
+	]
+}
