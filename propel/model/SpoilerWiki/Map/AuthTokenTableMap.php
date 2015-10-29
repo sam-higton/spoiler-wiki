@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use SpoilerWiki\Canon;
-use SpoilerWiki\CanonQuery;
+use SpoilerWiki\AuthToken;
+use SpoilerWiki\AuthTokenQuery;
 
 
 /**
- * This class defines the structure of the 'canon' table.
+ * This class defines the structure of the 'auth_token' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use SpoilerWiki\CanonQuery;
  * (i.e. if it's a text column type).
  *
  */
-class CanonTableMap extends TableMap
+class AuthTokenTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class CanonTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'SpoilerWiki.Map.CanonTableMap';
+    const CLASS_NAME = 'SpoilerWiki.Map.AuthTokenTableMap';
 
     /**
      * The default database name for this class
@@ -44,17 +44,17 @@ class CanonTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'canon';
+    const TABLE_NAME = 'auth_token';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\SpoilerWiki\\Canon';
+    const OM_CLASS = '\\SpoilerWiki\\AuthToken';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'SpoilerWiki.Canon';
+    const CLASS_DEFAULT = 'SpoilerWiki.AuthToken';
 
     /**
      * The total number of columns
@@ -74,22 +74,22 @@ class CanonTableMap extends TableMap
     /**
      * the column name for the id field
      */
-    const COL_ID = 'canon.id';
+    const COL_ID = 'auth_token.id';
 
     /**
-     * the column name for the name field
+     * the column name for the user_id field
      */
-    const COL_NAME = 'canon.name';
+    const COL_USER_ID = 'auth_token.user_id';
 
     /**
-     * the column name for the description field
+     * the column name for the token field
      */
-    const COL_DESCRIPTION = 'canon.description';
+    const COL_TOKEN = 'auth_token.token';
 
     /**
-     * the column name for the primary_artist_id field
+     * the column name for the created field
      */
-    const COL_PRIMARY_ARTIST_ID = 'canon.primary_artist_id';
+    const COL_CREATED = 'auth_token.created';
 
     /**
      * The default string format for model objects of the related table
@@ -103,10 +103,10 @@ class CanonTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', 'PrimaryArtistId', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'description', 'primaryArtistId', ),
-        self::TYPE_COLNAME       => array(CanonTableMap::COL_ID, CanonTableMap::COL_NAME, CanonTableMap::COL_DESCRIPTION, CanonTableMap::COL_PRIMARY_ARTIST_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'description', 'primary_artist_id', ),
+        self::TYPE_PHPNAME       => array('Id', 'UserId', 'Token', 'Created', ),
+        self::TYPE_CAMELNAME     => array('id', 'userId', 'token', 'created', ),
+        self::TYPE_COLNAME       => array(AuthTokenTableMap::COL_ID, AuthTokenTableMap::COL_USER_ID, AuthTokenTableMap::COL_TOKEN, AuthTokenTableMap::COL_CREATED, ),
+        self::TYPE_FIELDNAME     => array('id', 'user_id', 'token', 'created', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -117,10 +117,10 @@ class CanonTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, 'PrimaryArtistId' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primaryArtistId' => 3, ),
-        self::TYPE_COLNAME       => array(CanonTableMap::COL_ID => 0, CanonTableMap::COL_NAME => 1, CanonTableMap::COL_DESCRIPTION => 2, CanonTableMap::COL_PRIMARY_ARTIST_ID => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primary_artist_id' => 3, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'UserId' => 1, 'Token' => 2, 'Created' => 3, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'userId' => 1, 'token' => 2, 'created' => 3, ),
+        self::TYPE_COLNAME       => array(AuthTokenTableMap::COL_ID => 0, AuthTokenTableMap::COL_USER_ID => 1, AuthTokenTableMap::COL_TOKEN => 2, AuthTokenTableMap::COL_CREATED => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'user_id' => 1, 'token' => 2, 'created' => 3, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -134,17 +134,17 @@ class CanonTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('canon');
-        $this->setPhpName('Canon');
+        $this->setName('auth_token');
+        $this->setPhpName('AuthToken');
         $this->setIdentifierQuoting(true);
-        $this->setClassName('\\SpoilerWiki\\Canon');
+        $this->setClassName('\\SpoilerWiki\\AuthToken');
         $this->setPackage('SpoilerWiki');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
-        $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
-        $this->addForeignKey('primary_artist_id', 'PrimaryArtistId', 'INTEGER', 'artist', 'id', true, null, null);
+        $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'user', 'id', true, null, null);
+        $this->addColumn('token', 'Token', 'VARCHAR', true, 255, null);
+        $this->addColumn('created', 'Created', 'TIMESTAMP', false, null, 'CURRENT_TIMESTAMP');
     } // initialize()
 
     /**
@@ -152,34 +152,13 @@ class CanonTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('primaryArtist', '\\SpoilerWiki\\Artist', RelationMap::MANY_TO_ONE, array (
+        $this->addRelation('user', '\\SpoilerWiki\\User', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':primary_artist_id',
+    0 => ':user_id',
     1 => ':id',
   ),
 ), null, null, null, false);
-        $this->addRelation('Work', '\\SpoilerWiki\\Work', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':canon_id',
-    1 => ':id',
-  ),
-), null, null, 'Works', false);
-        $this->addRelation('Topic', '\\SpoilerWiki\\Topic', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':canon_id',
-    1 => ':id',
-  ),
-), null, null, 'Topics', false);
-        $this->addRelation('AssignedRole', '\\SpoilerWiki\\AssignedRole', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':canon_id',
-    1 => ':id',
-  ),
-), null, null, 'AssignedRoles', false);
     } // buildRelations()
 
     /**
@@ -239,7 +218,7 @@ class CanonTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CanonTableMap::CLASS_DEFAULT : CanonTableMap::OM_CLASS;
+        return $withPrefix ? AuthTokenTableMap::CLASS_DEFAULT : AuthTokenTableMap::OM_CLASS;
     }
 
     /**
@@ -253,22 +232,22 @@ class CanonTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Canon object, last column rank)
+     * @return array           (AuthToken object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CanonTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CanonTableMap::getInstanceFromPool($key))) {
+        $key = AuthTokenTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = AuthTokenTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CanonTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + AuthTokenTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CanonTableMap::OM_CLASS;
-            /** @var Canon $obj */
+            $cls = AuthTokenTableMap::OM_CLASS;
+            /** @var AuthToken $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CanonTableMap::addInstanceToPool($obj, $key);
+            AuthTokenTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -291,18 +270,18 @@ class CanonTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CanonTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CanonTableMap::getInstanceFromPool($key))) {
+            $key = AuthTokenTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = AuthTokenTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Canon $obj */
+                /** @var AuthToken $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CanonTableMap::addInstanceToPool($obj, $key);
+                AuthTokenTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -323,15 +302,15 @@ class CanonTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CanonTableMap::COL_ID);
-            $criteria->addSelectColumn(CanonTableMap::COL_NAME);
-            $criteria->addSelectColumn(CanonTableMap::COL_DESCRIPTION);
-            $criteria->addSelectColumn(CanonTableMap::COL_PRIMARY_ARTIST_ID);
+            $criteria->addSelectColumn(AuthTokenTableMap::COL_ID);
+            $criteria->addSelectColumn(AuthTokenTableMap::COL_USER_ID);
+            $criteria->addSelectColumn(AuthTokenTableMap::COL_TOKEN);
+            $criteria->addSelectColumn(AuthTokenTableMap::COL_CREATED);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.description');
-            $criteria->addSelectColumn($alias . '.primary_artist_id');
+            $criteria->addSelectColumn($alias . '.user_id');
+            $criteria->addSelectColumn($alias . '.token');
+            $criteria->addSelectColumn($alias . '.created');
         }
     }
 
@@ -344,7 +323,7 @@ class CanonTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CanonTableMap::DATABASE_NAME)->getTable(CanonTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(AuthTokenTableMap::DATABASE_NAME)->getTable(AuthTokenTableMap::TABLE_NAME);
     }
 
     /**
@@ -352,16 +331,16 @@ class CanonTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(CanonTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(CanonTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new CanonTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(AuthTokenTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(AuthTokenTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new AuthTokenTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Canon or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a AuthToken or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Canon object or primary key or array of primary keys
+     * @param mixed               $values Criteria or AuthToken object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -372,27 +351,27 @@ class CanonTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CanonTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AuthTokenTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \SpoilerWiki\Canon) { // it's a model object
+        } elseif ($values instanceof \SpoilerWiki\AuthToken) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CanonTableMap::DATABASE_NAME);
-            $criteria->add(CanonTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(AuthTokenTableMap::DATABASE_NAME);
+            $criteria->add(AuthTokenTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = CanonQuery::create()->mergeWith($criteria);
+        $query = AuthTokenQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            CanonTableMap::clearInstancePool();
+            AuthTokenTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                CanonTableMap::removeInstanceFromPool($singleval);
+                AuthTokenTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -400,20 +379,20 @@ class CanonTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the canon table.
+     * Deletes all rows from the auth_token table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CanonQuery::create()->doDeleteAll($con);
+        return AuthTokenQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Canon or Criteria object.
+     * Performs an INSERT on the database, given a AuthToken or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Canon object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or AuthToken object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -422,22 +401,22 @@ class CanonTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CanonTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AuthTokenTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Canon object
+            $criteria = $criteria->buildCriteria(); // build Criteria from AuthToken object
         }
 
-        if ($criteria->containsKey(CanonTableMap::COL_ID) && $criteria->keyContainsValue(CanonTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CanonTableMap::COL_ID.')');
+        if ($criteria->containsKey(AuthTokenTableMap::COL_ID) && $criteria->keyContainsValue(AuthTokenTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AuthTokenTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = CanonQuery::create()->mergeWith($criteria);
+        $query = AuthTokenQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -446,7 +425,7 @@ class CanonTableMap extends TableMap
         });
     }
 
-} // CanonTableMap
+} // AuthTokenTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CanonTableMap::buildTableMap();
+AuthTokenTableMap::buildTableMap();

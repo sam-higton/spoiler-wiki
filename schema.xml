@@ -1,4 +1,5 @@
 <database name="spoilerwiki-local" defaultIdMethod="native" namespace="SpoilerWiki" identifierQuoting="true">
+    <!-- wiki tables -->
     <table name="artist" phpName="Artist">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true" />
@@ -92,4 +93,49 @@
             <reference local="introduced_at" foreign="id" />
         </foreign-key>
     </table>
+
+    <!-- user auth tables -->
+    <table name="user" phpName="User">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="username" type="varchar" size="255" required="true" />
+        <column name="password" type="varchar" size="255" required="true" />
+        <column name="email" type="varchar" size="255" required="false" />
+    </table>
+    <table name="auth_token" phpName="AuthToken">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="user_id" type="integer" required="true" />
+        <column name="token" type="varchar" size="255" required="true" />
+        <column name="created" type="TIMESTAMP" defaultExpr="CURRENT_TIMESTAMP" />
+        <!-- foreign keys -->
+        <foreign-key foreignTable="user" phpName="user">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+    </table>
+    <table name="role" phpName="Role">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="name" type="varchar" size="255" required="true" />
+        <column name="description" type="varchar" size="255" required="false" />
+    </table>
+    <table name="assigned_role" phpName="AssignedRole">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="user_id" type="integer" required="true"/>
+        <column name="canon_id" type="integer" required="true"/>
+        <column name="role_id" type="integer" required="true"/>
+        <column name="assigned_by" type="integer" required="true"/>
+        <!-- foreign keys -->
+        <foreign-key foreignTable="user" phpName="user">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="user" phpName="assignedBy">
+            <reference local="assigned_by" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="canon" phpName="canon">
+            <reference local="canon_id" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="role" phpName="role">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+    </table>
+
+
 </database>

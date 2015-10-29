@@ -16,31 +16,25 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use SpoilerWiki\Artist as ChildArtist;
-use SpoilerWiki\ArtistQuery as ChildArtistQuery;
 use SpoilerWiki\AssignedRole as ChildAssignedRole;
 use SpoilerWiki\AssignedRoleQuery as ChildAssignedRoleQuery;
-use SpoilerWiki\Canon as ChildCanon;
-use SpoilerWiki\CanonQuery as ChildCanonQuery;
-use SpoilerWiki\Topic as ChildTopic;
-use SpoilerWiki\TopicQuery as ChildTopicQuery;
-use SpoilerWiki\Work as ChildWork;
-use SpoilerWiki\WorkQuery as ChildWorkQuery;
-use SpoilerWiki\Map\CanonTableMap;
+use SpoilerWiki\Role as ChildRole;
+use SpoilerWiki\RoleQuery as ChildRoleQuery;
+use SpoilerWiki\Map\RoleTableMap;
 
 /**
- * Base class that represents a row from the 'canon' table.
+ * Base class that represents a row from the 'role' table.
  *
  * 
  *
 * @package    propel.generator.SpoilerWiki.Base
 */
-abstract class Canon implements ActiveRecordInterface 
+abstract class Role implements ActiveRecordInterface 
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\SpoilerWiki\\Map\\CanonTableMap';
+    const TABLE_MAP = '\\SpoilerWiki\\Map\\RoleTableMap';
 
 
     /**
@@ -91,30 +85,6 @@ abstract class Canon implements ActiveRecordInterface
     protected $description;
 
     /**
-     * The value for the primary_artist_id field.
-     * 
-     * @var        int
-     */
-    protected $primary_artist_id;
-
-    /**
-     * @var        ChildArtist
-     */
-    protected $aprimaryArtist;
-
-    /**
-     * @var        ObjectCollection|ChildWork[] Collection to store aggregation of ChildWork objects.
-     */
-    protected $collWorks;
-    protected $collWorksPartial;
-
-    /**
-     * @var        ObjectCollection|ChildTopic[] Collection to store aggregation of ChildTopic objects.
-     */
-    protected $collTopics;
-    protected $collTopicsPartial;
-
-    /**
      * @var        ObjectCollection|ChildAssignedRole[] Collection to store aggregation of ChildAssignedRole objects.
      */
     protected $collAssignedRoles;
@@ -130,24 +100,12 @@ abstract class Canon implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildWork[]
-     */
-    protected $worksScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildTopic[]
-     */
-    protected $topicsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildAssignedRole[]
      */
     protected $assignedRolesScheduledForDeletion = null;
 
     /**
-     * Initializes internal state of SpoilerWiki\Base\Canon object.
+     * Initializes internal state of SpoilerWiki\Base\Role object.
      */
     public function __construct()
     {
@@ -242,9 +200,9 @@ abstract class Canon implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Canon</code> instance.  If
-     * <code>obj</code> is an instance of <code>Canon</code>, delegates to
-     * <code>equals(Canon)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Role</code> instance.  If
+     * <code>obj</code> is an instance of <code>Role</code>, delegates to
+     * <code>equals(Role)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -310,7 +268,7 @@ abstract class Canon implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Canon The current object, for fluid interface
+     * @return $this|Role The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -399,20 +357,10 @@ abstract class Canon implements ActiveRecordInterface
     }
 
     /**
-     * Get the [primary_artist_id] column value.
-     * 
-     * @return int
-     */
-    public function getPrimaryArtistId()
-    {
-        return $this->primary_artist_id;
-    }
-
-    /**
      * Set the value of [id] column.
      * 
      * @param int $v new value
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
+     * @return $this|\SpoilerWiki\Role The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -422,7 +370,7 @@ abstract class Canon implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[CanonTableMap::COL_ID] = true;
+            $this->modifiedColumns[RoleTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -432,7 +380,7 @@ abstract class Canon implements ActiveRecordInterface
      * Set the value of [name] column.
      * 
      * @param string $v new value
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
+     * @return $this|\SpoilerWiki\Role The current object (for fluent API support)
      */
     public function setName($v)
     {
@@ -442,7 +390,7 @@ abstract class Canon implements ActiveRecordInterface
 
         if ($this->name !== $v) {
             $this->name = $v;
-            $this->modifiedColumns[CanonTableMap::COL_NAME] = true;
+            $this->modifiedColumns[RoleTableMap::COL_NAME] = true;
         }
 
         return $this;
@@ -452,7 +400,7 @@ abstract class Canon implements ActiveRecordInterface
      * Set the value of [description] column.
      * 
      * @param string $v new value
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
+     * @return $this|\SpoilerWiki\Role The current object (for fluent API support)
      */
     public function setDescription($v)
     {
@@ -462,35 +410,11 @@ abstract class Canon implements ActiveRecordInterface
 
         if ($this->description !== $v) {
             $this->description = $v;
-            $this->modifiedColumns[CanonTableMap::COL_DESCRIPTION] = true;
+            $this->modifiedColumns[RoleTableMap::COL_DESCRIPTION] = true;
         }
 
         return $this;
     } // setDescription()
-
-    /**
-     * Set the value of [primary_artist_id] column.
-     * 
-     * @param int $v new value
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
-     */
-    public function setPrimaryArtistId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->primary_artist_id !== $v) {
-            $this->primary_artist_id = $v;
-            $this->modifiedColumns[CanonTableMap::COL_PRIMARY_ARTIST_ID] = true;
-        }
-
-        if ($this->aprimaryArtist !== null && $this->aprimaryArtist->getId() !== $v) {
-            $this->aprimaryArtist = null;
-        }
-
-        return $this;
-    } // setPrimaryArtistId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -528,17 +452,14 @@ abstract class Canon implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CanonTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : RoleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CanonTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RoleTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CanonTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RoleTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
             $this->description = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CanonTableMap::translateFieldName('PrimaryArtistId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->primary_artist_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -547,10 +468,10 @@ abstract class Canon implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = CanonTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = RoleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\SpoilerWiki\\Canon'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\SpoilerWiki\\Role'), 0, $e);
         }
     }
 
@@ -569,9 +490,6 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aprimaryArtist !== null && $this->primary_artist_id !== $this->aprimaryArtist->getId()) {
-            $this->aprimaryArtist = null;
-        }
     } // ensureConsistency
 
     /**
@@ -595,13 +513,13 @@ abstract class Canon implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CanonTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(RoleTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildCanonQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildRoleQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -610,11 +528,6 @@ abstract class Canon implements ActiveRecordInterface
         $this->hydrate($row, 0, true, $dataFetcher->getIndexType()); // rehydrate
 
         if ($deep) {  // also de-associate any related objects?
-
-            $this->aprimaryArtist = null;
-            $this->collWorks = null;
-
-            $this->collTopics = null;
 
             $this->collAssignedRoles = null;
 
@@ -627,8 +540,8 @@ abstract class Canon implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Canon::setDeleted()
-     * @see Canon::isDeleted()
+     * @see Role::setDeleted()
+     * @see Role::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -637,11 +550,11 @@ abstract class Canon implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CanonTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RoleTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildCanonQuery::create()
+            $deleteQuery = ChildRoleQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -672,7 +585,7 @@ abstract class Canon implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CanonTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RoleTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -691,7 +604,7 @@ abstract class Canon implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CanonTableMap::addInstanceToPool($this);
+                RoleTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -717,18 +630,6 @@ abstract class Canon implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their corresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aprimaryArtist !== null) {
-                if ($this->aprimaryArtist->isModified() || $this->aprimaryArtist->isNew()) {
-                    $affectedRows += $this->aprimaryArtist->save($con);
-                }
-                $this->setprimaryArtist($this->aprimaryArtist);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -738,40 +639,6 @@ abstract class Canon implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
-            }
-
-            if ($this->worksScheduledForDeletion !== null) {
-                if (!$this->worksScheduledForDeletion->isEmpty()) {
-                    \SpoilerWiki\WorkQuery::create()
-                        ->filterByPrimaryKeys($this->worksScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->worksScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collWorks !== null) {
-                foreach ($this->collWorks as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->topicsScheduledForDeletion !== null) {
-                if (!$this->topicsScheduledForDeletion->isEmpty()) {
-                    \SpoilerWiki\TopicQuery::create()
-                        ->filterByPrimaryKeys($this->topicsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->topicsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTopics !== null) {
-                foreach ($this->collTopics as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             if ($this->assignedRolesScheduledForDeletion !== null) {
@@ -811,27 +678,24 @@ abstract class Canon implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[CanonTableMap::COL_ID] = true;
+        $this->modifiedColumns[RoleTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CanonTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . RoleTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CanonTableMap::COL_ID)) {
+        if ($this->isColumnModified(RoleTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(CanonTableMap::COL_NAME)) {
+        if ($this->isColumnModified(RoleTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = '`name`';
         }
-        if ($this->isColumnModified(CanonTableMap::COL_DESCRIPTION)) {
+        if ($this->isColumnModified(RoleTableMap::COL_DESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = '`description`';
-        }
-        if ($this->isColumnModified(CanonTableMap::COL_PRIMARY_ARTIST_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`primary_artist_id`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `canon` (%s) VALUES (%s)',
+            'INSERT INTO `role` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -848,9 +712,6 @@ abstract class Canon implements ActiveRecordInterface
                         break;
                     case '`description`':                        
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
-                        break;
-                    case '`primary_artist_id`':                        
-                        $stmt->bindValue($identifier, $this->primary_artist_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -898,7 +759,7 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CanonTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = RoleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -922,9 +783,6 @@ abstract class Canon implements ActiveRecordInterface
                 break;
             case 2:
                 return $this->getDescription();
-                break;
-            case 3:
-                return $this->getPrimaryArtistId();
                 break;
             default:
                 return null;
@@ -950,16 +808,15 @@ abstract class Canon implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['Canon'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['Role'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Canon'][$this->hashCode()] = true;
-        $keys = CanonTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Role'][$this->hashCode()] = true;
+        $keys = RoleTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
             $keys[2] => $this->getDescription(),
-            $keys[3] => $this->getPrimaryArtistId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -967,51 +824,6 @@ abstract class Canon implements ActiveRecordInterface
         }
         
         if ($includeForeignObjects) {
-            if (null !== $this->aprimaryArtist) {
-                
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'artist';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'artist';
-                        break;
-                    default:
-                        $key = 'Artist';
-                }
-        
-                $result[$key] = $this->aprimaryArtist->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->collWorks) {
-                
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'works';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'works';
-                        break;
-                    default:
-                        $key = 'Works';
-                }
-        
-                $result[$key] = $this->collWorks->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collTopics) {
-                
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'topics';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'topics';
-                        break;
-                    default:
-                        $key = 'Topics';
-                }
-        
-                $result[$key] = $this->collTopics->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collAssignedRoles) {
                 
                 switch ($keyType) {
@@ -1041,11 +853,11 @@ abstract class Canon implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\SpoilerWiki\Canon
+     * @return $this|\SpoilerWiki\Role
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CanonTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = RoleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1056,7 +868,7 @@ abstract class Canon implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\SpoilerWiki\Canon
+     * @return $this|\SpoilerWiki\Role
      */
     public function setByPosition($pos, $value)
     {
@@ -1069,9 +881,6 @@ abstract class Canon implements ActiveRecordInterface
                 break;
             case 2:
                 $this->setDescription($value);
-                break;
-            case 3:
-                $this->setPrimaryArtistId($value);
                 break;
         } // switch()
 
@@ -1097,7 +906,7 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = CanonTableMap::getFieldNames($keyType);
+        $keys = RoleTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
             $this->setId($arr[$keys[0]]);
@@ -1107,9 +916,6 @@ abstract class Canon implements ActiveRecordInterface
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setDescription($arr[$keys[2]]);
-        }
-        if (array_key_exists($keys[3], $arr)) {
-            $this->setPrimaryArtistId($arr[$keys[3]]);
         }
     }
 
@@ -1130,7 +936,7 @@ abstract class Canon implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\SpoilerWiki\Canon The current object, for fluid interface
+     * @return $this|\SpoilerWiki\Role The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1150,19 +956,16 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CanonTableMap::DATABASE_NAME);
+        $criteria = new Criteria(RoleTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CanonTableMap::COL_ID)) {
-            $criteria->add(CanonTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(RoleTableMap::COL_ID)) {
+            $criteria->add(RoleTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(CanonTableMap::COL_NAME)) {
-            $criteria->add(CanonTableMap::COL_NAME, $this->name);
+        if ($this->isColumnModified(RoleTableMap::COL_NAME)) {
+            $criteria->add(RoleTableMap::COL_NAME, $this->name);
         }
-        if ($this->isColumnModified(CanonTableMap::COL_DESCRIPTION)) {
-            $criteria->add(CanonTableMap::COL_DESCRIPTION, $this->description);
-        }
-        if ($this->isColumnModified(CanonTableMap::COL_PRIMARY_ARTIST_ID)) {
-            $criteria->add(CanonTableMap::COL_PRIMARY_ARTIST_ID, $this->primary_artist_id);
+        if ($this->isColumnModified(RoleTableMap::COL_DESCRIPTION)) {
+            $criteria->add(RoleTableMap::COL_DESCRIPTION, $this->description);
         }
 
         return $criteria;
@@ -1180,8 +983,8 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildCanonQuery::create();
-        $criteria->add(CanonTableMap::COL_ID, $this->id);
+        $criteria = ChildRoleQuery::create();
+        $criteria->add(RoleTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1243,7 +1046,7 @@ abstract class Canon implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \SpoilerWiki\Canon (or compatible) type.
+     * @param      object $copyObj An object of \SpoilerWiki\Role (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1252,24 +1055,11 @@ abstract class Canon implements ActiveRecordInterface
     {
         $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
-        $copyObj->setPrimaryArtistId($this->getPrimaryArtistId());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
-
-            foreach ($this->getWorks() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addWork($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getTopics() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTopic($relObj->copy($deepCopy));
-                }
-            }
 
             foreach ($this->getAssignedRoles() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1294,7 +1084,7 @@ abstract class Canon implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \SpoilerWiki\Canon Clone of current object.
+     * @return \SpoilerWiki\Role Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1305,57 +1095,6 @@ abstract class Canon implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
-    }
-
-    /**
-     * Declares an association between this object and a ChildArtist object.
-     *
-     * @param  ChildArtist $v
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setprimaryArtist(ChildArtist $v = null)
-    {
-        if ($v === null) {
-            $this->setPrimaryArtistId(NULL);
-        } else {
-            $this->setPrimaryArtistId($v->getId());
-        }
-
-        $this->aprimaryArtist = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildArtist object, it will not be re-added.
-        if ($v !== null) {
-            $v->addCanon($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildArtist object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildArtist The associated ChildArtist object.
-     * @throws PropelException
-     */
-    public function getprimaryArtist(ConnectionInterface $con = null)
-    {
-        if ($this->aprimaryArtist === null && ($this->primary_artist_id !== null)) {
-            $this->aprimaryArtist = ChildArtistQuery::create()->findPk($this->primary_artist_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aprimaryArtist->addCanons($this);
-             */
-        }
-
-        return $this->aprimaryArtist;
     }
 
 
@@ -1369,526 +1108,9 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Work' == $relationName) {
-            return $this->initWorks();
-        }
-        if ('Topic' == $relationName) {
-            return $this->initTopics();
-        }
         if ('AssignedRole' == $relationName) {
             return $this->initAssignedRoles();
         }
-    }
-
-    /**
-     * Clears out the collWorks collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addWorks()
-     */
-    public function clearWorks()
-    {
-        $this->collWorks = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collWorks collection loaded partially.
-     */
-    public function resetPartialWorks($v = true)
-    {
-        $this->collWorksPartial = $v;
-    }
-
-    /**
-     * Initializes the collWorks collection.
-     *
-     * By default this just sets the collWorks collection to an empty array (like clearcollWorks());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initWorks($overrideExisting = true)
-    {
-        if (null !== $this->collWorks && !$overrideExisting) {
-            return;
-        }
-        $this->collWorks = new ObjectCollection();
-        $this->collWorks->setModel('\SpoilerWiki\Work');
-    }
-
-    /**
-     * Gets an array of ChildWork objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCanon is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
-     * @throws PropelException
-     */
-    public function getWorks(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
-                // return empty collection
-                $this->initWorks();
-            } else {
-                $collWorks = ChildWorkQuery::create(null, $criteria)
-                    ->filterBycanon($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collWorksPartial && count($collWorks)) {
-                        $this->initWorks(false);
-
-                        foreach ($collWorks as $obj) {
-                            if (false == $this->collWorks->contains($obj)) {
-                                $this->collWorks->append($obj);
-                            }
-                        }
-
-                        $this->collWorksPartial = true;
-                    }
-
-                    return $collWorks;
-                }
-
-                if ($partial && $this->collWorks) {
-                    foreach ($this->collWorks as $obj) {
-                        if ($obj->isNew()) {
-                            $collWorks[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collWorks = $collWorks;
-                $this->collWorksPartial = false;
-            }
-        }
-
-        return $this->collWorks;
-    }
-
-    /**
-     * Sets a collection of ChildWork objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $works A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCanon The current object (for fluent API support)
-     */
-    public function setWorks(Collection $works, ConnectionInterface $con = null)
-    {
-        /** @var ChildWork[] $worksToDelete */
-        $worksToDelete = $this->getWorks(new Criteria(), $con)->diff($works);
-
-        
-        $this->worksScheduledForDeletion = $worksToDelete;
-
-        foreach ($worksToDelete as $workRemoved) {
-            $workRemoved->setcanon(null);
-        }
-
-        $this->collWorks = null;
-        foreach ($works as $work) {
-            $this->addWork($work);
-        }
-
-        $this->collWorks = $works;
-        $this->collWorksPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Work objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Work objects.
-     * @throws PropelException
-     */
-    public function countWorks(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getWorks());
-            }
-
-            $query = ChildWorkQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterBycanon($this)
-                ->count($con);
-        }
-
-        return count($this->collWorks);
-    }
-
-    /**
-     * Method called to associate a ChildWork object to this object
-     * through the ChildWork foreign key attribute.
-     *
-     * @param  ChildWork $l ChildWork
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
-     */
-    public function addWork(ChildWork $l)
-    {
-        if ($this->collWorks === null) {
-            $this->initWorks();
-            $this->collWorksPartial = true;
-        }
-
-        if (!$this->collWorks->contains($l)) {
-            $this->doAddWork($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildWork $work The ChildWork object to add.
-     */
-    protected function doAddWork(ChildWork $work)
-    {
-        $this->collWorks[]= $work;
-        $work->setcanon($this);
-    }
-
-    /**
-     * @param  ChildWork $work The ChildWork object to remove.
-     * @return $this|ChildCanon The current object (for fluent API support)
-     */
-    public function removeWork(ChildWork $work)
-    {
-        if ($this->getWorks()->contains($work)) {
-            $pos = $this->collWorks->search($work);
-            $this->collWorks->remove($pos);
-            if (null === $this->worksScheduledForDeletion) {
-                $this->worksScheduledForDeletion = clone $this->collWorks;
-                $this->worksScheduledForDeletion->clear();
-            }
-            $this->worksScheduledForDeletion[]= clone $work;
-            $work->setcanon(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Canon is new, it will return
-     * an empty collection; or if this Canon has previously
-     * been saved, it will retrieve related Works from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Canon.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
-     */
-    public function getWorksJoinprimaryArtist(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildWorkQuery::create(null, $criteria);
-        $query->joinWith('primaryArtist', $joinBehavior);
-
-        return $this->getWorks($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Canon is new, it will return
-     * an empty collection; or if this Canon has previously
-     * been saved, it will retrieve related Works from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Canon.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
-     */
-    public function getWorksJoinworkType(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildWorkQuery::create(null, $criteria);
-        $query->joinWith('workType', $joinBehavior);
-
-        return $this->getWorks($query, $con);
-    }
-
-    /**
-     * Clears out the collTopics collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addTopics()
-     */
-    public function clearTopics()
-    {
-        $this->collTopics = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collTopics collection loaded partially.
-     */
-    public function resetPartialTopics($v = true)
-    {
-        $this->collTopicsPartial = $v;
-    }
-
-    /**
-     * Initializes the collTopics collection.
-     *
-     * By default this just sets the collTopics collection to an empty array (like clearcollTopics());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTopics($overrideExisting = true)
-    {
-        if (null !== $this->collTopics && !$overrideExisting) {
-            return;
-        }
-        $this->collTopics = new ObjectCollection();
-        $this->collTopics->setModel('\SpoilerWiki\Topic');
-    }
-
-    /**
-     * Gets an array of ChildTopic objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCanon is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildTopic[] List of ChildTopic objects
-     * @throws PropelException
-     */
-    public function getTopics(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTopicsPartial && !$this->isNew();
-        if (null === $this->collTopics || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTopics) {
-                // return empty collection
-                $this->initTopics();
-            } else {
-                $collTopics = ChildTopicQuery::create(null, $criteria)
-                    ->filterBycanon($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collTopicsPartial && count($collTopics)) {
-                        $this->initTopics(false);
-
-                        foreach ($collTopics as $obj) {
-                            if (false == $this->collTopics->contains($obj)) {
-                                $this->collTopics->append($obj);
-                            }
-                        }
-
-                        $this->collTopicsPartial = true;
-                    }
-
-                    return $collTopics;
-                }
-
-                if ($partial && $this->collTopics) {
-                    foreach ($this->collTopics as $obj) {
-                        if ($obj->isNew()) {
-                            $collTopics[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTopics = $collTopics;
-                $this->collTopicsPartial = false;
-            }
-        }
-
-        return $this->collTopics;
-    }
-
-    /**
-     * Sets a collection of ChildTopic objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $topics A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCanon The current object (for fluent API support)
-     */
-    public function setTopics(Collection $topics, ConnectionInterface $con = null)
-    {
-        /** @var ChildTopic[] $topicsToDelete */
-        $topicsToDelete = $this->getTopics(new Criteria(), $con)->diff($topics);
-
-        
-        $this->topicsScheduledForDeletion = $topicsToDelete;
-
-        foreach ($topicsToDelete as $topicRemoved) {
-            $topicRemoved->setcanon(null);
-        }
-
-        $this->collTopics = null;
-        foreach ($topics as $topic) {
-            $this->addTopic($topic);
-        }
-
-        $this->collTopics = $topics;
-        $this->collTopicsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Topic objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Topic objects.
-     * @throws PropelException
-     */
-    public function countTopics(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTopicsPartial && !$this->isNew();
-        if (null === $this->collTopics || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTopics) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getTopics());
-            }
-
-            $query = ChildTopicQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterBycanon($this)
-                ->count($con);
-        }
-
-        return count($this->collTopics);
-    }
-
-    /**
-     * Method called to associate a ChildTopic object to this object
-     * through the ChildTopic foreign key attribute.
-     *
-     * @param  ChildTopic $l ChildTopic
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
-     */
-    public function addTopic(ChildTopic $l)
-    {
-        if ($this->collTopics === null) {
-            $this->initTopics();
-            $this->collTopicsPartial = true;
-        }
-
-        if (!$this->collTopics->contains($l)) {
-            $this->doAddTopic($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildTopic $topic The ChildTopic object to add.
-     */
-    protected function doAddTopic(ChildTopic $topic)
-    {
-        $this->collTopics[]= $topic;
-        $topic->setcanon($this);
-    }
-
-    /**
-     * @param  ChildTopic $topic The ChildTopic object to remove.
-     * @return $this|ChildCanon The current object (for fluent API support)
-     */
-    public function removeTopic(ChildTopic $topic)
-    {
-        if ($this->getTopics()->contains($topic)) {
-            $pos = $this->collTopics->search($topic);
-            $this->collTopics->remove($pos);
-            if (null === $this->topicsScheduledForDeletion) {
-                $this->topicsScheduledForDeletion = clone $this->collTopics;
-                $this->topicsScheduledForDeletion->clear();
-            }
-            $this->topicsScheduledForDeletion[]= clone $topic;
-            $topic->setcanon(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Canon is new, it will return
-     * an empty collection; or if this Canon has previously
-     * been saved, it will retrieve related Topics from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Canon.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildTopic[] List of ChildTopic objects
-     */
-    public function getTopicsJoinintroducedAt(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildTopicQuery::create(null, $criteria);
-        $query->joinWith('introducedAt', $joinBehavior);
-
-        return $this->getTopics($query, $con);
     }
 
     /**
@@ -1940,7 +1162,7 @@ abstract class Canon implements ActiveRecordInterface
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCanon is new, it will return
+     * If this ChildRole is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
@@ -1957,7 +1179,7 @@ abstract class Canon implements ActiveRecordInterface
                 $this->initAssignedRoles();
             } else {
                 $collAssignedRoles = ChildAssignedRoleQuery::create(null, $criteria)
-                    ->filterBycanon($this)
+                    ->filterByrole($this)
                     ->find($con);
 
                 if (null !== $criteria) {
@@ -2000,7 +1222,7 @@ abstract class Canon implements ActiveRecordInterface
      *
      * @param      Collection $assignedRoles A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCanon The current object (for fluent API support)
+     * @return $this|ChildRole The current object (for fluent API support)
      */
     public function setAssignedRoles(Collection $assignedRoles, ConnectionInterface $con = null)
     {
@@ -2011,7 +1233,7 @@ abstract class Canon implements ActiveRecordInterface
         $this->assignedRolesScheduledForDeletion = $assignedRolesToDelete;
 
         foreach ($assignedRolesToDelete as $assignedRoleRemoved) {
-            $assignedRoleRemoved->setcanon(null);
+            $assignedRoleRemoved->setrole(null);
         }
 
         $this->collAssignedRoles = null;
@@ -2052,7 +1274,7 @@ abstract class Canon implements ActiveRecordInterface
             }
 
             return $query
-                ->filterBycanon($this)
+                ->filterByrole($this)
                 ->count($con);
         }
 
@@ -2064,7 +1286,7 @@ abstract class Canon implements ActiveRecordInterface
      * through the ChildAssignedRole foreign key attribute.
      *
      * @param  ChildAssignedRole $l ChildAssignedRole
-     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
+     * @return $this|\SpoilerWiki\Role The current object (for fluent API support)
      */
     public function addAssignedRole(ChildAssignedRole $l)
     {
@@ -2086,12 +1308,12 @@ abstract class Canon implements ActiveRecordInterface
     protected function doAddAssignedRole(ChildAssignedRole $assignedRole)
     {
         $this->collAssignedRoles[]= $assignedRole;
-        $assignedRole->setcanon($this);
+        $assignedRole->setrole($this);
     }
 
     /**
      * @param  ChildAssignedRole $assignedRole The ChildAssignedRole object to remove.
-     * @return $this|ChildCanon The current object (for fluent API support)
+     * @return $this|ChildRole The current object (for fluent API support)
      */
     public function removeAssignedRole(ChildAssignedRole $assignedRole)
     {
@@ -2103,7 +1325,7 @@ abstract class Canon implements ActiveRecordInterface
                 $this->assignedRolesScheduledForDeletion->clear();
             }
             $this->assignedRolesScheduledForDeletion[]= clone $assignedRole;
-            $assignedRole->setcanon(null);
+            $assignedRole->setrole(null);
         }
 
         return $this;
@@ -2113,13 +1335,13 @@ abstract class Canon implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Canon is new, it will return
-     * an empty collection; or if this Canon has previously
+     * Otherwise if this Role is new, it will return
+     * an empty collection; or if this Role has previously
      * been saved, it will retrieve related AssignedRoles from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Canon.
+     * actually need in Role.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -2138,13 +1360,13 @@ abstract class Canon implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Canon is new, it will return
-     * an empty collection; or if this Canon has previously
+     * Otherwise if this Role is new, it will return
+     * an empty collection; or if this Role has previously
      * been saved, it will retrieve related AssignedRoles from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Canon.
+     * actually need in Role.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -2163,23 +1385,23 @@ abstract class Canon implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Canon is new, it will return
-     * an empty collection; or if this Canon has previously
+     * Otherwise if this Role is new, it will return
+     * an empty collection; or if this Role has previously
      * been saved, it will retrieve related AssignedRoles from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Canon.
+     * actually need in Role.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return ObjectCollection|ChildAssignedRole[] List of ChildAssignedRole objects
      */
-    public function getAssignedRolesJoinrole(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getAssignedRolesJoincanon(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildAssignedRoleQuery::create(null, $criteria);
-        $query->joinWith('role', $joinBehavior);
+        $query->joinWith('canon', $joinBehavior);
 
         return $this->getAssignedRoles($query, $con);
     }
@@ -2191,13 +1413,9 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aprimaryArtist) {
-            $this->aprimaryArtist->removeCanon($this);
-        }
         $this->id = null;
         $this->name = null;
         $this->description = null;
-        $this->primary_artist_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -2216,16 +1434,6 @@ abstract class Canon implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collWorks) {
-                foreach ($this->collWorks as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collTopics) {
-                foreach ($this->collTopics as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collAssignedRoles) {
                 foreach ($this->collAssignedRoles as $o) {
                     $o->clearAllReferences($deep);
@@ -2233,10 +1441,7 @@ abstract class Canon implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        $this->collWorks = null;
-        $this->collTopics = null;
         $this->collAssignedRoles = null;
-        $this->aprimaryArtist = null;
     }
 
     /**
@@ -2246,7 +1451,7 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CanonTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(RoleTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**
