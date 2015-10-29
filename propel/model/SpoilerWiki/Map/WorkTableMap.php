@@ -39,7 +39,7 @@ class WorkTableMap extends TableMap
     /**
      * The default database name for this class
      */
-    const DATABASE_NAME = 'spoilerwiki-local';
+    const DATABASE_NAME = 'spoilerwiki-remote';
 
     /**
      * The table name for this class
@@ -59,7 +59,7 @@ class WorkTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class WorkTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
@@ -102,11 +102,6 @@ class WorkTableMap extends TableMap
     const COL_CANON_ID = 'work.canon_id';
 
     /**
-     * the column name for the work_type_id field
-     */
-    const COL_WORK_TYPE_ID = 'work.work_type_id';
-
-    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -118,11 +113,11 @@ class WorkTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', 'Order', 'PrimaryArtistId', 'CanonId', 'WorkTypeId', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'description', 'order', 'primaryArtistId', 'canonId', 'workTypeId', ),
-        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID, WorkTableMap::COL_NAME, WorkTableMap::COL_DESCRIPTION, WorkTableMap::COL_ORDER, WorkTableMap::COL_PRIMARY_ARTIST_ID, WorkTableMap::COL_CANON_ID, WorkTableMap::COL_WORK_TYPE_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'description', 'order', 'primary_artist_id', 'canon_id', 'work_type_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', 'Order', 'PrimaryArtistId', 'CanonId', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'description', 'order', 'primaryArtistId', 'canonId', ),
+        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID, WorkTableMap::COL_NAME, WorkTableMap::COL_DESCRIPTION, WorkTableMap::COL_ORDER, WorkTableMap::COL_PRIMARY_ARTIST_ID, WorkTableMap::COL_CANON_ID, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'description', 'order', 'primary_artist_id', 'canon_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -132,11 +127,11 @@ class WorkTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, 'Order' => 3, 'PrimaryArtistId' => 4, 'CanonId' => 5, 'WorkTypeId' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'order' => 3, 'primaryArtistId' => 4, 'canonId' => 5, 'workTypeId' => 6, ),
-        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID => 0, WorkTableMap::COL_NAME => 1, WorkTableMap::COL_DESCRIPTION => 2, WorkTableMap::COL_ORDER => 3, WorkTableMap::COL_PRIMARY_ARTIST_ID => 4, WorkTableMap::COL_CANON_ID => 5, WorkTableMap::COL_WORK_TYPE_ID => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'order' => 3, 'primary_artist_id' => 4, 'canon_id' => 5, 'work_type_id' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, 'Order' => 3, 'PrimaryArtistId' => 4, 'CanonId' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'order' => 3, 'primaryArtistId' => 4, 'canonId' => 5, ),
+        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID => 0, WorkTableMap::COL_NAME => 1, WorkTableMap::COL_DESCRIPTION => 2, WorkTableMap::COL_ORDER => 3, WorkTableMap::COL_PRIMARY_ARTIST_ID => 4, WorkTableMap::COL_CANON_ID => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'order' => 3, 'primary_artist_id' => 4, 'canon_id' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -162,7 +157,6 @@ class WorkTableMap extends TableMap
         $this->addColumn('order', 'Order', 'INTEGER', true, null, 0);
         $this->addForeignKey('primary_artist_id', 'PrimaryArtistId', 'INTEGER', 'artist', 'id', true, null, null);
         $this->addForeignKey('canon_id', 'CanonId', 'INTEGER', 'canon', 'id', true, null, null);
-        $this->addForeignKey('work_type_id', 'WorkTypeId', 'INTEGER', 'work_type', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -181,13 +175,6 @@ class WorkTableMap extends TableMap
   0 =>
   array (
     0 => ':canon_id',
-    1 => ':id',
-  ),
-), null, null, null, false);
-        $this->addRelation('workType', '\\SpoilerWiki\\WorkType', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':work_type_id',
     1 => ':id',
   ),
 ), null, null, null, false);
@@ -347,7 +334,6 @@ class WorkTableMap extends TableMap
             $criteria->addSelectColumn(WorkTableMap::COL_ORDER);
             $criteria->addSelectColumn(WorkTableMap::COL_PRIMARY_ARTIST_ID);
             $criteria->addSelectColumn(WorkTableMap::COL_CANON_ID);
-            $criteria->addSelectColumn(WorkTableMap::COL_WORK_TYPE_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
@@ -355,7 +341,6 @@ class WorkTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.order');
             $criteria->addSelectColumn($alias . '.primary_artist_id');
             $criteria->addSelectColumn($alias . '.canon_id');
-            $criteria->addSelectColumn($alias . '.work_type_id');
         }
     }
 

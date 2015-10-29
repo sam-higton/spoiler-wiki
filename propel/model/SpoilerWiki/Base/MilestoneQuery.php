@@ -115,7 +115,7 @@ abstract class MilestoneQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'spoilerwiki-local', $modelName = '\\SpoilerWiki\\Milestone', $modelAlias = null)
+    public function __construct($dbName = 'spoilerwiki-remote', $modelName = '\\SpoilerWiki\\Milestone', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }

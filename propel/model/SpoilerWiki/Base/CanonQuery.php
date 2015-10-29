@@ -24,11 +24,13 @@ use SpoilerWiki\Map\CanonTableMap;
  * @method     ChildCanonQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildCanonQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildCanonQuery orderByPrimaryArtistId($order = Criteria::ASC) Order by the primary_artist_id column
+ * @method     ChildCanonQuery orderByWorkTypeId($order = Criteria::ASC) Order by the work_type_id column
  *
  * @method     ChildCanonQuery groupById() Group by the id column
  * @method     ChildCanonQuery groupByName() Group by the name column
  * @method     ChildCanonQuery groupByDescription() Group by the description column
  * @method     ChildCanonQuery groupByPrimaryArtistId() Group by the primary_artist_id column
+ * @method     ChildCanonQuery groupByWorkTypeId() Group by the work_type_id column
  *
  * @method     ChildCanonQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildCanonQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -37,6 +39,16 @@ use SpoilerWiki\Map\CanonTableMap;
  * @method     ChildCanonQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
  * @method     ChildCanonQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildCanonQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ *
+ * @method     ChildCanonQuery leftJoinworkType($relationAlias = null) Adds a LEFT JOIN clause to the query using the workType relation
+ * @method     ChildCanonQuery rightJoinworkType($relationAlias = null) Adds a RIGHT JOIN clause to the query using the workType relation
+ * @method     ChildCanonQuery innerJoinworkType($relationAlias = null) Adds a INNER JOIN clause to the query using the workType relation
+ *
+ * @method     ChildCanonQuery joinWithworkType($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the workType relation
+ *
+ * @method     ChildCanonQuery leftJoinWithworkType() Adds a LEFT JOIN clause and with to the query using the workType relation
+ * @method     ChildCanonQuery rightJoinWithworkType() Adds a RIGHT JOIN clause and with to the query using the workType relation
+ * @method     ChildCanonQuery innerJoinWithworkType() Adds a INNER JOIN clause and with to the query using the workType relation
  *
  * @method     ChildCanonQuery leftJoinprimaryArtist($relationAlias = null) Adds a LEFT JOIN clause to the query using the primaryArtist relation
  * @method     ChildCanonQuery rightJoinprimaryArtist($relationAlias = null) Adds a RIGHT JOIN clause to the query using the primaryArtist relation
@@ -78,7 +90,7 @@ use SpoilerWiki\Map\CanonTableMap;
  * @method     ChildCanonQuery rightJoinWithAssignedRole() Adds a RIGHT JOIN clause and with to the query using the AssignedRole relation
  * @method     ChildCanonQuery innerJoinWithAssignedRole() Adds a INNER JOIN clause and with to the query using the AssignedRole relation
  *
- * @method     \SpoilerWiki\ArtistQuery|\SpoilerWiki\WorkQuery|\SpoilerWiki\TopicQuery|\SpoilerWiki\AssignedRoleQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \SpoilerWiki\WorkTypeQuery|\SpoilerWiki\ArtistQuery|\SpoilerWiki\WorkQuery|\SpoilerWiki\TopicQuery|\SpoilerWiki\AssignedRoleQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildCanon findOne(ConnectionInterface $con = null) Return the first ChildCanon matching the query
  * @method     ChildCanon findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCanon matching the query, or a new ChildCanon object populated from the query conditions when no match is found
@@ -86,7 +98,8 @@ use SpoilerWiki\Map\CanonTableMap;
  * @method     ChildCanon findOneById(int $id) Return the first ChildCanon filtered by the id column
  * @method     ChildCanon findOneByName(string $name) Return the first ChildCanon filtered by the name column
  * @method     ChildCanon findOneByDescription(string $description) Return the first ChildCanon filtered by the description column
- * @method     ChildCanon findOneByPrimaryArtistId(int $primary_artist_id) Return the first ChildCanon filtered by the primary_artist_id column *
+ * @method     ChildCanon findOneByPrimaryArtistId(int $primary_artist_id) Return the first ChildCanon filtered by the primary_artist_id column
+ * @method     ChildCanon findOneByWorkTypeId(int $work_type_id) Return the first ChildCanon filtered by the work_type_id column *
 
  * @method     ChildCanon requirePk($key, ConnectionInterface $con = null) Return the ChildCanon by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCanon requireOne(ConnectionInterface $con = null) Return the first ChildCanon matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -95,12 +108,14 @@ use SpoilerWiki\Map\CanonTableMap;
  * @method     ChildCanon requireOneByName(string $name) Return the first ChildCanon filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCanon requireOneByDescription(string $description) Return the first ChildCanon filtered by the description column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCanon requireOneByPrimaryArtistId(int $primary_artist_id) Return the first ChildCanon filtered by the primary_artist_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildCanon requireOneByWorkTypeId(int $work_type_id) Return the first ChildCanon filtered by the work_type_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildCanon[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildCanon objects based on current ModelCriteria
  * @method     ChildCanon[]|ObjectCollection findById(int $id) Return ChildCanon objects filtered by the id column
  * @method     ChildCanon[]|ObjectCollection findByName(string $name) Return ChildCanon objects filtered by the name column
  * @method     ChildCanon[]|ObjectCollection findByDescription(string $description) Return ChildCanon objects filtered by the description column
  * @method     ChildCanon[]|ObjectCollection findByPrimaryArtistId(int $primary_artist_id) Return ChildCanon objects filtered by the primary_artist_id column
+ * @method     ChildCanon[]|ObjectCollection findByWorkTypeId(int $work_type_id) Return ChildCanon objects filtered by the work_type_id column
  * @method     ChildCanon[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -115,7 +130,7 @@ abstract class CanonQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'spoilerwiki-local', $modelName = '\\SpoilerWiki\\Canon', $modelAlias = null)
+    public function __construct($dbName = 'spoilerwiki-remote', $modelName = '\\SpoilerWiki\\Canon', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -193,7 +208,7 @@ abstract class CanonQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT `id`, `name`, `description`, `primary_artist_id` FROM `canon` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `name`, `description`, `primary_artist_id`, `work_type_id` FROM `canon` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -423,6 +438,126 @@ abstract class CanonQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CanonTableMap::COL_PRIMARY_ARTIST_ID, $primaryArtistId, $comparison);
+    }
+
+    /**
+     * Filter the query on the work_type_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByWorkTypeId(1234); // WHERE work_type_id = 1234
+     * $query->filterByWorkTypeId(array(12, 34)); // WHERE work_type_id IN (12, 34)
+     * $query->filterByWorkTypeId(array('min' => 12)); // WHERE work_type_id > 12
+     * </code>
+     *
+     * @see       filterByworkType()
+     *
+     * @param     mixed $workTypeId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildCanonQuery The current query, for fluid interface
+     */
+    public function filterByWorkTypeId($workTypeId = null, $comparison = null)
+    {
+        if (is_array($workTypeId)) {
+            $useMinMax = false;
+            if (isset($workTypeId['min'])) {
+                $this->addUsingAlias(CanonTableMap::COL_WORK_TYPE_ID, $workTypeId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($workTypeId['max'])) {
+                $this->addUsingAlias(CanonTableMap::COL_WORK_TYPE_ID, $workTypeId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CanonTableMap::COL_WORK_TYPE_ID, $workTypeId, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \SpoilerWiki\WorkType object
+     *
+     * @param \SpoilerWiki\WorkType|ObjectCollection $workType The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildCanonQuery The current query, for fluid interface
+     */
+    public function filterByworkType($workType, $comparison = null)
+    {
+        if ($workType instanceof \SpoilerWiki\WorkType) {
+            return $this
+                ->addUsingAlias(CanonTableMap::COL_WORK_TYPE_ID, $workType->getId(), $comparison);
+        } elseif ($workType instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(CanonTableMap::COL_WORK_TYPE_ID, $workType->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByworkType() only accepts arguments of type \SpoilerWiki\WorkType or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the workType relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildCanonQuery The current query, for fluid interface
+     */
+    public function joinworkType($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('workType');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'workType');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the workType relation WorkType object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \SpoilerWiki\WorkTypeQuery A secondary query class using the current class as primary query
+     */
+    public function useworkTypeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinworkType($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'workType', '\SpoilerWiki\WorkTypeQuery');
     }
 
     /**

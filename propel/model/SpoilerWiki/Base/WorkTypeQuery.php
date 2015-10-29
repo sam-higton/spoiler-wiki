@@ -38,17 +38,17 @@ use SpoilerWiki\Map\WorkTypeTableMap;
  * @method     ChildWorkTypeQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildWorkTypeQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildWorkTypeQuery leftJoinWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the Work relation
- * @method     ChildWorkTypeQuery rightJoinWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Work relation
- * @method     ChildWorkTypeQuery innerJoinWork($relationAlias = null) Adds a INNER JOIN clause to the query using the Work relation
+ * @method     ChildWorkTypeQuery leftJoinCanon($relationAlias = null) Adds a LEFT JOIN clause to the query using the Canon relation
+ * @method     ChildWorkTypeQuery rightJoinCanon($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Canon relation
+ * @method     ChildWorkTypeQuery innerJoinCanon($relationAlias = null) Adds a INNER JOIN clause to the query using the Canon relation
  *
- * @method     ChildWorkTypeQuery joinWithWork($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Work relation
+ * @method     ChildWorkTypeQuery joinWithCanon($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Canon relation
  *
- * @method     ChildWorkTypeQuery leftJoinWithWork() Adds a LEFT JOIN clause and with to the query using the Work relation
- * @method     ChildWorkTypeQuery rightJoinWithWork() Adds a RIGHT JOIN clause and with to the query using the Work relation
- * @method     ChildWorkTypeQuery innerJoinWithWork() Adds a INNER JOIN clause and with to the query using the Work relation
+ * @method     ChildWorkTypeQuery leftJoinWithCanon() Adds a LEFT JOIN clause and with to the query using the Canon relation
+ * @method     ChildWorkTypeQuery rightJoinWithCanon() Adds a RIGHT JOIN clause and with to the query using the Canon relation
+ * @method     ChildWorkTypeQuery innerJoinWithCanon() Adds a INNER JOIN clause and with to the query using the Canon relation
  *
- * @method     \SpoilerWiki\WorkQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \SpoilerWiki\CanonQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildWorkType findOne(ConnectionInterface $con = null) Return the first ChildWorkType matching the query
  * @method     ChildWorkType findOneOrCreate(ConnectionInterface $con = null) Return the first ChildWorkType matching the query, or a new ChildWorkType object populated from the query conditions when no match is found
@@ -85,7 +85,7 @@ abstract class WorkTypeQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'spoilerwiki-local', $modelName = '\\SpoilerWiki\\WorkType', $modelAlias = null)
+    public function __construct($dbName = 'spoilerwiki-remote', $modelName = '\\SpoilerWiki\\WorkType', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -382,40 +382,40 @@ abstract class WorkTypeQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \SpoilerWiki\Work object
+     * Filter the query by a related \SpoilerWiki\Canon object
      *
-     * @param \SpoilerWiki\Work|ObjectCollection $work the related object to use as filter
+     * @param \SpoilerWiki\Canon|ObjectCollection $canon the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildWorkTypeQuery The current query, for fluid interface
      */
-    public function filterByWork($work, $comparison = null)
+    public function filterByCanon($canon, $comparison = null)
     {
-        if ($work instanceof \SpoilerWiki\Work) {
+        if ($canon instanceof \SpoilerWiki\Canon) {
             return $this
-                ->addUsingAlias(WorkTypeTableMap::COL_ID, $work->getWorkTypeId(), $comparison);
-        } elseif ($work instanceof ObjectCollection) {
+                ->addUsingAlias(WorkTypeTableMap::COL_ID, $canon->getWorkTypeId(), $comparison);
+        } elseif ($canon instanceof ObjectCollection) {
             return $this
-                ->useWorkQuery()
-                ->filterByPrimaryKeys($work->getPrimaryKeys())
+                ->useCanonQuery()
+                ->filterByPrimaryKeys($canon->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByWork() only accepts arguments of type \SpoilerWiki\Work or Collection');
+            throw new PropelException('filterByCanon() only accepts arguments of type \SpoilerWiki\Canon or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Work relation
+     * Adds a JOIN clause to the query using the Canon relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildWorkTypeQuery The current query, for fluid interface
      */
-    public function joinWork($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCanon($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Work');
+        $relationMap = $tableMap->getRelation('Canon');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -430,14 +430,14 @@ abstract class WorkTypeQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Work');
+            $this->addJoinObject($join, 'Canon');
         }
 
         return $this;
     }
 
     /**
-     * Use the Work relation Work object
+     * Use the Canon relation Canon object
      *
      * @see useQuery()
      *
@@ -445,13 +445,13 @@ abstract class WorkTypeQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \SpoilerWiki\WorkQuery A secondary query class using the current class as primary query
+     * @return \SpoilerWiki\CanonQuery A secondary query class using the current class as primary query
      */
-    public function useWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCanonQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Work', '\SpoilerWiki\WorkQuery');
+            ->joinCanon($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Canon', '\SpoilerWiki\CanonQuery');
     }
 
     /**

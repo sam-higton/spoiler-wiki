@@ -24,8 +24,6 @@ use SpoilerWiki\Milestone as ChildMilestone;
 use SpoilerWiki\MilestoneQuery as ChildMilestoneQuery;
 use SpoilerWiki\Work as ChildWork;
 use SpoilerWiki\WorkQuery as ChildWorkQuery;
-use SpoilerWiki\WorkType as ChildWorkType;
-use SpoilerWiki\WorkTypeQuery as ChildWorkTypeQuery;
 use SpoilerWiki\Map\WorkTableMap;
 
 /**
@@ -113,13 +111,6 @@ abstract class Work implements ActiveRecordInterface
     protected $canon_id;
 
     /**
-     * The value for the work_type_id field.
-     * 
-     * @var        int
-     */
-    protected $work_type_id;
-
-    /**
      * @var        ChildArtist
      */
     protected $aprimaryArtist;
@@ -128,11 +119,6 @@ abstract class Work implements ActiveRecordInterface
      * @var        ChildCanon
      */
     protected $acanon;
-
-    /**
-     * @var        ChildWorkType
-     */
-    protected $aworkType;
 
     /**
      * @var        ObjectCollection|ChildMilestone[] Collection to store aggregation of ChildMilestone objects.
@@ -450,16 +436,6 @@ abstract class Work implements ActiveRecordInterface
     }
 
     /**
-     * Get the [work_type_id] column value.
-     * 
-     * @return int
-     */
-    public function getWorkTypeId()
-    {
-        return $this->work_type_id;
-    }
-
-    /**
      * Set the value of [id] column.
      * 
      * @param int $v new value
@@ -588,30 +564,6 @@ abstract class Work implements ActiveRecordInterface
     } // setCanonId()
 
     /**
-     * Set the value of [work_type_id] column.
-     * 
-     * @param int $v new value
-     * @return $this|\SpoilerWiki\Work The current object (for fluent API support)
-     */
-    public function setWorkTypeId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->work_type_id !== $v) {
-            $this->work_type_id = $v;
-            $this->modifiedColumns[WorkTableMap::COL_WORK_TYPE_ID] = true;
-        }
-
-        if ($this->aworkType !== null && $this->aworkType->getId() !== $v) {
-            $this->aworkType = null;
-        }
-
-        return $this;
-    } // setWorkTypeId()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -668,9 +620,6 @@ abstract class Work implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : WorkTableMap::translateFieldName('CanonId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->canon_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : WorkTableMap::translateFieldName('WorkTypeId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->work_type_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -679,7 +628,7 @@ abstract class Work implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = WorkTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = WorkTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\SpoilerWiki\\Work'), 0, $e);
@@ -706,9 +655,6 @@ abstract class Work implements ActiveRecordInterface
         }
         if ($this->acanon !== null && $this->canon_id !== $this->acanon->getId()) {
             $this->acanon = null;
-        }
-        if ($this->aworkType !== null && $this->work_type_id !== $this->aworkType->getId()) {
-            $this->aworkType = null;
         }
     } // ensureConsistency
 
@@ -751,7 +697,6 @@ abstract class Work implements ActiveRecordInterface
 
             $this->aprimaryArtist = null;
             $this->acanon = null;
-            $this->aworkType = null;
             $this->collMilestones = null;
 
         } // if (deep)
@@ -872,13 +817,6 @@ abstract class Work implements ActiveRecordInterface
                 $this->setcanon($this->acanon);
             }
 
-            if ($this->aworkType !== null) {
-                if ($this->aworkType->isModified() || $this->aworkType->isNew()) {
-                    $affectedRows += $this->aworkType->save($con);
-                }
-                $this->setworkType($this->aworkType);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -951,9 +889,6 @@ abstract class Work implements ActiveRecordInterface
         if ($this->isColumnModified(WorkTableMap::COL_CANON_ID)) {
             $modifiedColumns[':p' . $index++]  = '`canon_id`';
         }
-        if ($this->isColumnModified(WorkTableMap::COL_WORK_TYPE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`work_type_id`';
-        }
 
         $sql = sprintf(
             'INSERT INTO `work` (%s) VALUES (%s)',
@@ -982,9 +917,6 @@ abstract class Work implements ActiveRecordInterface
                         break;
                     case '`canon_id`':                        
                         $stmt->bindValue($identifier, $this->canon_id, PDO::PARAM_INT);
-                        break;
-                    case '`work_type_id`':                        
-                        $stmt->bindValue($identifier, $this->work_type_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -1066,9 +998,6 @@ abstract class Work implements ActiveRecordInterface
             case 5:
                 return $this->getCanonId();
                 break;
-            case 6:
-                return $this->getWorkTypeId();
-                break;
             default:
                 return null;
                 break;
@@ -1105,7 +1034,6 @@ abstract class Work implements ActiveRecordInterface
             $keys[3] => $this->getOrder(),
             $keys[4] => $this->getPrimaryArtistId(),
             $keys[5] => $this->getCanonId(),
-            $keys[6] => $this->getWorkTypeId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1142,21 +1070,6 @@ abstract class Work implements ActiveRecordInterface
                 }
         
                 $result[$key] = $this->acanon->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aworkType) {
-                
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'workType';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'work_type';
-                        break;
-                    default:
-                        $key = 'WorkType';
-                }
-        
-                $result[$key] = $this->aworkType->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collMilestones) {
                 
@@ -1225,9 +1138,6 @@ abstract class Work implements ActiveRecordInterface
             case 5:
                 $this->setCanonId($value);
                 break;
-            case 6:
-                $this->setWorkTypeId($value);
-                break;
         } // switch()
 
         return $this;
@@ -1271,9 +1181,6 @@ abstract class Work implements ActiveRecordInterface
         }
         if (array_key_exists($keys[5], $arr)) {
             $this->setCanonId($arr[$keys[5]]);
-        }
-        if (array_key_exists($keys[6], $arr)) {
-            $this->setWorkTypeId($arr[$keys[6]]);
         }
     }
 
@@ -1333,9 +1240,6 @@ abstract class Work implements ActiveRecordInterface
         }
         if ($this->isColumnModified(WorkTableMap::COL_CANON_ID)) {
             $criteria->add(WorkTableMap::COL_CANON_ID, $this->canon_id);
-        }
-        if ($this->isColumnModified(WorkTableMap::COL_WORK_TYPE_ID)) {
-            $criteria->add(WorkTableMap::COL_WORK_TYPE_ID, $this->work_type_id);
         }
 
         return $criteria;
@@ -1428,7 +1332,6 @@ abstract class Work implements ActiveRecordInterface
         $copyObj->setOrder($this->getOrder());
         $copyObj->setPrimaryArtistId($this->getPrimaryArtistId());
         $copyObj->setCanonId($this->getCanonId());
-        $copyObj->setWorkTypeId($this->getWorkTypeId());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1571,57 +1474,6 @@ abstract class Work implements ActiveRecordInterface
         }
 
         return $this->acanon;
-    }
-
-    /**
-     * Declares an association between this object and a ChildWorkType object.
-     *
-     * @param  ChildWorkType $v
-     * @return $this|\SpoilerWiki\Work The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setworkType(ChildWorkType $v = null)
-    {
-        if ($v === null) {
-            $this->setWorkTypeId(NULL);
-        } else {
-            $this->setWorkTypeId($v->getId());
-        }
-
-        $this->aworkType = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildWorkType object, it will not be re-added.
-        if ($v !== null) {
-            $v->addWork($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildWorkType object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildWorkType The associated ChildWorkType object.
-     * @throws PropelException
-     */
-    public function getworkType(ConnectionInterface $con = null)
-    {
-        if ($this->aworkType === null && ($this->work_type_id !== null)) {
-            $this->aworkType = ChildWorkTypeQuery::create()->findPk($this->work_type_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aworkType->addWorks($this);
-             */
-        }
-
-        return $this->aworkType;
     }
 
 
@@ -1871,16 +1723,12 @@ abstract class Work implements ActiveRecordInterface
         if (null !== $this->acanon) {
             $this->acanon->removeWork($this);
         }
-        if (null !== $this->aworkType) {
-            $this->aworkType->removeWork($this);
-        }
         $this->id = null;
         $this->name = null;
         $this->description = null;
         $this->order = null;
         $this->primary_artist_id = null;
         $this->canon_id = null;
-        $this->work_type_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -1910,7 +1758,6 @@ abstract class Work implements ActiveRecordInterface
         $this->collMilestones = null;
         $this->aprimaryArtist = null;
         $this->acanon = null;
-        $this->aworkType = null;
     }
 
     /**

@@ -29,8 +29,13 @@ CREATE TABLE `canon`
     `name` VARCHAR(255) NOT NULL,
     `description` TEXT,
     `primary_artist_id` INTEGER NOT NULL,
+    `work_type_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
+    INDEX `canon_fi_701e81` (`work_type_id`),
     INDEX `canon_fi_2233f1` (`primary_artist_id`),
+    CONSTRAINT `canon_fk_701e81`
+        FOREIGN KEY (`work_type_id`)
+        REFERENCES `work_type` (`id`),
     CONSTRAINT `canon_fk_2233f1`
         FOREIGN KEY (`primary_artist_id`)
         REFERENCES `artist` (`id`)
@@ -50,20 +55,15 @@ CREATE TABLE `work`
     `order` INTEGER DEFAULT 0 NOT NULL,
     `primary_artist_id` INTEGER NOT NULL,
     `canon_id` INTEGER NOT NULL,
-    `work_type_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `work_fi_2233f1` (`primary_artist_id`),
     INDEX `work_fi_eeb6b0` (`canon_id`),
-    INDEX `work_fi_701e81` (`work_type_id`),
     CONSTRAINT `work_fk_2233f1`
         FOREIGN KEY (`primary_artist_id`)
         REFERENCES `artist` (`id`),
     CONSTRAINT `work_fk_eeb6b0`
         FOREIGN KEY (`canon_id`)
-        REFERENCES `canon` (`id`),
-    CONSTRAINT `work_fk_701e81`
-        FOREIGN KEY (`work_type_id`)
-        REFERENCES `work_type` (`id`)
+        REFERENCES `canon` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

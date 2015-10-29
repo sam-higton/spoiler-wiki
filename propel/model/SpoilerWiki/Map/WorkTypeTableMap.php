@@ -39,7 +39,7 @@ class WorkTypeTableMap extends TableMap
     /**
      * The default database name for this class
      */
-    const DATABASE_NAME = 'spoilerwiki-local';
+    const DATABASE_NAME = 'spoilerwiki-remote';
 
     /**
      * The table name for this class
@@ -152,13 +152,13 @@ class WorkTypeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Work', '\\SpoilerWiki\\Work', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Canon', '\\SpoilerWiki\\Canon', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
     0 => ':work_type_id',
     1 => ':id',
   ),
-), null, null, 'Works', false);
+), null, null, 'Canons', false);
     } // buildRelations()
 
     /**

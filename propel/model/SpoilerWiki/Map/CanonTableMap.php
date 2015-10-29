@@ -39,7 +39,7 @@ class CanonTableMap extends TableMap
     /**
      * The default database name for this class
      */
-    const DATABASE_NAME = 'spoilerwiki-local';
+    const DATABASE_NAME = 'spoilerwiki-remote';
 
     /**
      * The table name for this class
@@ -59,7 +59,7 @@ class CanonTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class CanonTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the id field
@@ -92,6 +92,11 @@ class CanonTableMap extends TableMap
     const COL_PRIMARY_ARTIST_ID = 'canon.primary_artist_id';
 
     /**
+     * the column name for the work_type_id field
+     */
+    const COL_WORK_TYPE_ID = 'canon.work_type_id';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -103,11 +108,11 @@ class CanonTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', 'PrimaryArtistId', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'description', 'primaryArtistId', ),
-        self::TYPE_COLNAME       => array(CanonTableMap::COL_ID, CanonTableMap::COL_NAME, CanonTableMap::COL_DESCRIPTION, CanonTableMap::COL_PRIMARY_ARTIST_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'description', 'primary_artist_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', 'PrimaryArtistId', 'WorkTypeId', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'description', 'primaryArtistId', 'workTypeId', ),
+        self::TYPE_COLNAME       => array(CanonTableMap::COL_ID, CanonTableMap::COL_NAME, CanonTableMap::COL_DESCRIPTION, CanonTableMap::COL_PRIMARY_ARTIST_ID, CanonTableMap::COL_WORK_TYPE_ID, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'description', 'primary_artist_id', 'work_type_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -117,11 +122,11 @@ class CanonTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, 'PrimaryArtistId' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primaryArtistId' => 3, ),
-        self::TYPE_COLNAME       => array(CanonTableMap::COL_ID => 0, CanonTableMap::COL_NAME => 1, CanonTableMap::COL_DESCRIPTION => 2, CanonTableMap::COL_PRIMARY_ARTIST_ID => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primary_artist_id' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, 'PrimaryArtistId' => 3, 'WorkTypeId' => 4, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primaryArtistId' => 3, 'workTypeId' => 4, ),
+        self::TYPE_COLNAME       => array(CanonTableMap::COL_ID => 0, CanonTableMap::COL_NAME => 1, CanonTableMap::COL_DESCRIPTION => 2, CanonTableMap::COL_PRIMARY_ARTIST_ID => 3, CanonTableMap::COL_WORK_TYPE_ID => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primary_artist_id' => 3, 'work_type_id' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -145,6 +150,7 @@ class CanonTableMap extends TableMap
         $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('primary_artist_id', 'PrimaryArtistId', 'INTEGER', 'artist', 'id', true, null, null);
+        $this->addForeignKey('work_type_id', 'WorkTypeId', 'INTEGER', 'work_type', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -152,6 +158,13 @@ class CanonTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('workType', '\\SpoilerWiki\\WorkType', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':work_type_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
         $this->addRelation('primaryArtist', '\\SpoilerWiki\\Artist', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
@@ -327,11 +340,13 @@ class CanonTableMap extends TableMap
             $criteria->addSelectColumn(CanonTableMap::COL_NAME);
             $criteria->addSelectColumn(CanonTableMap::COL_DESCRIPTION);
             $criteria->addSelectColumn(CanonTableMap::COL_PRIMARY_ARTIST_ID);
+            $criteria->addSelectColumn(CanonTableMap::COL_WORK_TYPE_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.description');
             $criteria->addSelectColumn($alias . '.primary_artist_id');
+            $criteria->addSelectColumn($alias . '.work_type_id');
         }
     }
 

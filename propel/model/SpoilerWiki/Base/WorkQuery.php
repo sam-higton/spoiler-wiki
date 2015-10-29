@@ -26,7 +26,6 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWorkQuery orderByOrder($order = Criteria::ASC) Order by the order column
  * @method     ChildWorkQuery orderByPrimaryArtistId($order = Criteria::ASC) Order by the primary_artist_id column
  * @method     ChildWorkQuery orderByCanonId($order = Criteria::ASC) Order by the canon_id column
- * @method     ChildWorkQuery orderByWorkTypeId($order = Criteria::ASC) Order by the work_type_id column
  *
  * @method     ChildWorkQuery groupById() Group by the id column
  * @method     ChildWorkQuery groupByName() Group by the name column
@@ -34,7 +33,6 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWorkQuery groupByOrder() Group by the order column
  * @method     ChildWorkQuery groupByPrimaryArtistId() Group by the primary_artist_id column
  * @method     ChildWorkQuery groupByCanonId() Group by the canon_id column
- * @method     ChildWorkQuery groupByWorkTypeId() Group by the work_type_id column
  *
  * @method     ChildWorkQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildWorkQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -64,16 +62,6 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWorkQuery rightJoinWithcanon() Adds a RIGHT JOIN clause and with to the query using the canon relation
  * @method     ChildWorkQuery innerJoinWithcanon() Adds a INNER JOIN clause and with to the query using the canon relation
  *
- * @method     ChildWorkQuery leftJoinworkType($relationAlias = null) Adds a LEFT JOIN clause to the query using the workType relation
- * @method     ChildWorkQuery rightJoinworkType($relationAlias = null) Adds a RIGHT JOIN clause to the query using the workType relation
- * @method     ChildWorkQuery innerJoinworkType($relationAlias = null) Adds a INNER JOIN clause to the query using the workType relation
- *
- * @method     ChildWorkQuery joinWithworkType($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the workType relation
- *
- * @method     ChildWorkQuery leftJoinWithworkType() Adds a LEFT JOIN clause and with to the query using the workType relation
- * @method     ChildWorkQuery rightJoinWithworkType() Adds a RIGHT JOIN clause and with to the query using the workType relation
- * @method     ChildWorkQuery innerJoinWithworkType() Adds a INNER JOIN clause and with to the query using the workType relation
- *
  * @method     ChildWorkQuery leftJoinMilestone($relationAlias = null) Adds a LEFT JOIN clause to the query using the Milestone relation
  * @method     ChildWorkQuery rightJoinMilestone($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Milestone relation
  * @method     ChildWorkQuery innerJoinMilestone($relationAlias = null) Adds a INNER JOIN clause to the query using the Milestone relation
@@ -84,7 +72,7 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWorkQuery rightJoinWithMilestone() Adds a RIGHT JOIN clause and with to the query using the Milestone relation
  * @method     ChildWorkQuery innerJoinWithMilestone() Adds a INNER JOIN clause and with to the query using the Milestone relation
  *
- * @method     \SpoilerWiki\ArtistQuery|\SpoilerWiki\CanonQuery|\SpoilerWiki\WorkTypeQuery|\SpoilerWiki\MilestoneQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \SpoilerWiki\ArtistQuery|\SpoilerWiki\CanonQuery|\SpoilerWiki\MilestoneQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildWork findOne(ConnectionInterface $con = null) Return the first ChildWork matching the query
  * @method     ChildWork findOneOrCreate(ConnectionInterface $con = null) Return the first ChildWork matching the query, or a new ChildWork object populated from the query conditions when no match is found
@@ -94,8 +82,7 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWork findOneByDescription(string $description) Return the first ChildWork filtered by the description column
  * @method     ChildWork findOneByOrder(int $order) Return the first ChildWork filtered by the order column
  * @method     ChildWork findOneByPrimaryArtistId(int $primary_artist_id) Return the first ChildWork filtered by the primary_artist_id column
- * @method     ChildWork findOneByCanonId(int $canon_id) Return the first ChildWork filtered by the canon_id column
- * @method     ChildWork findOneByWorkTypeId(int $work_type_id) Return the first ChildWork filtered by the work_type_id column *
+ * @method     ChildWork findOneByCanonId(int $canon_id) Return the first ChildWork filtered by the canon_id column *
 
  * @method     ChildWork requirePk($key, ConnectionInterface $con = null) Return the ChildWork by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOne(ConnectionInterface $con = null) Return the first ChildWork matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -106,7 +93,6 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWork requireOneByOrder(int $order) Return the first ChildWork filtered by the order column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOneByPrimaryArtistId(int $primary_artist_id) Return the first ChildWork filtered by the primary_artist_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOneByCanonId(int $canon_id) Return the first ChildWork filtered by the canon_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildWork requireOneByWorkTypeId(int $work_type_id) Return the first ChildWork filtered by the work_type_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildWork[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildWork objects based on current ModelCriteria
  * @method     ChildWork[]|ObjectCollection findById(int $id) Return ChildWork objects filtered by the id column
@@ -115,7 +101,6 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWork[]|ObjectCollection findByOrder(int $order) Return ChildWork objects filtered by the order column
  * @method     ChildWork[]|ObjectCollection findByPrimaryArtistId(int $primary_artist_id) Return ChildWork objects filtered by the primary_artist_id column
  * @method     ChildWork[]|ObjectCollection findByCanonId(int $canon_id) Return ChildWork objects filtered by the canon_id column
- * @method     ChildWork[]|ObjectCollection findByWorkTypeId(int $work_type_id) Return ChildWork objects filtered by the work_type_id column
  * @method     ChildWork[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -130,7 +115,7 @@ abstract class WorkQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'spoilerwiki-local', $modelName = '\\SpoilerWiki\\Work', $modelAlias = null)
+    public function __construct($dbName = 'spoilerwiki-remote', $modelName = '\\SpoilerWiki\\Work', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -208,7 +193,7 @@ abstract class WorkQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT `id`, `name`, `description`, `order`, `primary_artist_id`, `canon_id`, `work_type_id` FROM `work` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `name`, `description`, `order`, `primary_artist_id`, `canon_id` FROM `work` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -525,49 +510,6 @@ abstract class WorkQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the work_type_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByWorkTypeId(1234); // WHERE work_type_id = 1234
-     * $query->filterByWorkTypeId(array(12, 34)); // WHERE work_type_id IN (12, 34)
-     * $query->filterByWorkTypeId(array('min' => 12)); // WHERE work_type_id > 12
-     * </code>
-     *
-     * @see       filterByworkType()
-     *
-     * @param     mixed $workTypeId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildWorkQuery The current query, for fluid interface
-     */
-    public function filterByWorkTypeId($workTypeId = null, $comparison = null)
-    {
-        if (is_array($workTypeId)) {
-            $useMinMax = false;
-            if (isset($workTypeId['min'])) {
-                $this->addUsingAlias(WorkTableMap::COL_WORK_TYPE_ID, $workTypeId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($workTypeId['max'])) {
-                $this->addUsingAlias(WorkTableMap::COL_WORK_TYPE_ID, $workTypeId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(WorkTableMap::COL_WORK_TYPE_ID, $workTypeId, $comparison);
-    }
-
-    /**
      * Filter the query by a related \SpoilerWiki\Artist object
      *
      * @param \SpoilerWiki\Artist|ObjectCollection $artist The related object(s) to use as filter
@@ -719,83 +661,6 @@ abstract class WorkQuery extends ModelCriteria
         return $this
             ->joincanon($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'canon', '\SpoilerWiki\CanonQuery');
-    }
-
-    /**
-     * Filter the query by a related \SpoilerWiki\WorkType object
-     *
-     * @param \SpoilerWiki\WorkType|ObjectCollection $workType The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildWorkQuery The current query, for fluid interface
-     */
-    public function filterByworkType($workType, $comparison = null)
-    {
-        if ($workType instanceof \SpoilerWiki\WorkType) {
-            return $this
-                ->addUsingAlias(WorkTableMap::COL_WORK_TYPE_ID, $workType->getId(), $comparison);
-        } elseif ($workType instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(WorkTableMap::COL_WORK_TYPE_ID, $workType->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByworkType() only accepts arguments of type \SpoilerWiki\WorkType or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the workType relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildWorkQuery The current query, for fluid interface
-     */
-    public function joinworkType($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('workType');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'workType');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the workType relation WorkType object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \SpoilerWiki\WorkTypeQuery A secondary query class using the current class as primary query
-     */
-    public function useworkTypeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinworkType($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'workType', '\SpoilerWiki\WorkTypeQuery');
     }
 
     /**

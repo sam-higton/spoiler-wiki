@@ -26,6 +26,8 @@ use SpoilerWiki\Topic as ChildTopic;
 use SpoilerWiki\TopicQuery as ChildTopicQuery;
 use SpoilerWiki\Work as ChildWork;
 use SpoilerWiki\WorkQuery as ChildWorkQuery;
+use SpoilerWiki\WorkType as ChildWorkType;
+use SpoilerWiki\WorkTypeQuery as ChildWorkTypeQuery;
 use SpoilerWiki\Map\CanonTableMap;
 
 /**
@@ -96,6 +98,18 @@ abstract class Canon implements ActiveRecordInterface
      * @var        int
      */
     protected $primary_artist_id;
+
+    /**
+     * The value for the work_type_id field.
+     * 
+     * @var        int
+     */
+    protected $work_type_id;
+
+    /**
+     * @var        ChildWorkType
+     */
+    protected $aworkType;
 
     /**
      * @var        ChildArtist
@@ -409,6 +423,16 @@ abstract class Canon implements ActiveRecordInterface
     }
 
     /**
+     * Get the [work_type_id] column value.
+     * 
+     * @return int
+     */
+    public function getWorkTypeId()
+    {
+        return $this->work_type_id;
+    }
+
+    /**
      * Set the value of [id] column.
      * 
      * @param int $v new value
@@ -493,6 +517,30 @@ abstract class Canon implements ActiveRecordInterface
     } // setPrimaryArtistId()
 
     /**
+     * Set the value of [work_type_id] column.
+     * 
+     * @param int $v new value
+     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
+     */
+    public function setWorkTypeId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->work_type_id !== $v) {
+            $this->work_type_id = $v;
+            $this->modifiedColumns[CanonTableMap::COL_WORK_TYPE_ID] = true;
+        }
+
+        if ($this->aworkType !== null && $this->aworkType->getId() !== $v) {
+            $this->aworkType = null;
+        }
+
+        return $this;
+    } // setWorkTypeId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -539,6 +587,9 @@ abstract class Canon implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CanonTableMap::translateFieldName('PrimaryArtistId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->primary_artist_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CanonTableMap::translateFieldName('WorkTypeId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->work_type_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -547,7 +598,7 @@ abstract class Canon implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = CanonTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = CanonTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\SpoilerWiki\\Canon'), 0, $e);
@@ -571,6 +622,9 @@ abstract class Canon implements ActiveRecordInterface
     {
         if ($this->aprimaryArtist !== null && $this->primary_artist_id !== $this->aprimaryArtist->getId()) {
             $this->aprimaryArtist = null;
+        }
+        if ($this->aworkType !== null && $this->work_type_id !== $this->aworkType->getId()) {
+            $this->aworkType = null;
         }
     } // ensureConsistency
 
@@ -611,6 +665,7 @@ abstract class Canon implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aworkType = null;
             $this->aprimaryArtist = null;
             $this->collWorks = null;
 
@@ -722,6 +777,13 @@ abstract class Canon implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aworkType !== null) {
+                if ($this->aworkType->isModified() || $this->aworkType->isNew()) {
+                    $affectedRows += $this->aworkType->save($con);
+                }
+                $this->setworkType($this->aworkType);
+            }
+
             if ($this->aprimaryArtist !== null) {
                 if ($this->aprimaryArtist->isModified() || $this->aprimaryArtist->isNew()) {
                     $affectedRows += $this->aprimaryArtist->save($con);
@@ -829,6 +891,9 @@ abstract class Canon implements ActiveRecordInterface
         if ($this->isColumnModified(CanonTableMap::COL_PRIMARY_ARTIST_ID)) {
             $modifiedColumns[':p' . $index++]  = '`primary_artist_id`';
         }
+        if ($this->isColumnModified(CanonTableMap::COL_WORK_TYPE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`work_type_id`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `canon` (%s) VALUES (%s)',
@@ -851,6 +916,9 @@ abstract class Canon implements ActiveRecordInterface
                         break;
                     case '`primary_artist_id`':                        
                         $stmt->bindValue($identifier, $this->primary_artist_id, PDO::PARAM_INT);
+                        break;
+                    case '`work_type_id`':                        
+                        $stmt->bindValue($identifier, $this->work_type_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -926,6 +994,9 @@ abstract class Canon implements ActiveRecordInterface
             case 3:
                 return $this->getPrimaryArtistId();
                 break;
+            case 4:
+                return $this->getWorkTypeId();
+                break;
             default:
                 return null;
                 break;
@@ -960,6 +1031,7 @@ abstract class Canon implements ActiveRecordInterface
             $keys[1] => $this->getName(),
             $keys[2] => $this->getDescription(),
             $keys[3] => $this->getPrimaryArtistId(),
+            $keys[4] => $this->getWorkTypeId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -967,6 +1039,21 @@ abstract class Canon implements ActiveRecordInterface
         }
         
         if ($includeForeignObjects) {
+            if (null !== $this->aworkType) {
+                
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'workType';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'work_type';
+                        break;
+                    default:
+                        $key = 'WorkType';
+                }
+        
+                $result[$key] = $this->aworkType->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->aprimaryArtist) {
                 
                 switch ($keyType) {
@@ -1073,6 +1160,9 @@ abstract class Canon implements ActiveRecordInterface
             case 3:
                 $this->setPrimaryArtistId($value);
                 break;
+            case 4:
+                $this->setWorkTypeId($value);
+                break;
         } // switch()
 
         return $this;
@@ -1110,6 +1200,9 @@ abstract class Canon implements ActiveRecordInterface
         }
         if (array_key_exists($keys[3], $arr)) {
             $this->setPrimaryArtistId($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setWorkTypeId($arr[$keys[4]]);
         }
     }
 
@@ -1163,6 +1256,9 @@ abstract class Canon implements ActiveRecordInterface
         }
         if ($this->isColumnModified(CanonTableMap::COL_PRIMARY_ARTIST_ID)) {
             $criteria->add(CanonTableMap::COL_PRIMARY_ARTIST_ID, $this->primary_artist_id);
+        }
+        if ($this->isColumnModified(CanonTableMap::COL_WORK_TYPE_ID)) {
+            $criteria->add(CanonTableMap::COL_WORK_TYPE_ID, $this->work_type_id);
         }
 
         return $criteria;
@@ -1253,6 +1349,7 @@ abstract class Canon implements ActiveRecordInterface
         $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setPrimaryArtistId($this->getPrimaryArtistId());
+        $copyObj->setWorkTypeId($this->getWorkTypeId());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1305,6 +1402,57 @@ abstract class Canon implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+    /**
+     * Declares an association between this object and a ChildWorkType object.
+     *
+     * @param  ChildWorkType $v
+     * @return $this|\SpoilerWiki\Canon The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setworkType(ChildWorkType $v = null)
+    {
+        if ($v === null) {
+            $this->setWorkTypeId(NULL);
+        } else {
+            $this->setWorkTypeId($v->getId());
+        }
+
+        $this->aworkType = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildWorkType object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCanon($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildWorkType object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildWorkType The associated ChildWorkType object.
+     * @throws PropelException
+     */
+    public function getworkType(ConnectionInterface $con = null)
+    {
+        if ($this->aworkType === null && ($this->work_type_id !== null)) {
+            $this->aworkType = ChildWorkTypeQuery::create()->findPk($this->work_type_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aworkType->addCanons($this);
+             */
+        }
+
+        return $this->aworkType;
     }
 
     /**
@@ -1619,31 +1767,6 @@ abstract class Canon implements ActiveRecordInterface
     {
         $query = ChildWorkQuery::create(null, $criteria);
         $query->joinWith('primaryArtist', $joinBehavior);
-
-        return $this->getWorks($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Canon is new, it will return
-     * an empty collection; or if this Canon has previously
-     * been saved, it will retrieve related Works from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Canon.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
-     */
-    public function getWorksJoinworkType(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildWorkQuery::create(null, $criteria);
-        $query->joinWith('workType', $joinBehavior);
 
         return $this->getWorks($query, $con);
     }
@@ -2191,6 +2314,9 @@ abstract class Canon implements ActiveRecordInterface
      */
     public function clear()
     {
+        if (null !== $this->aworkType) {
+            $this->aworkType->removeCanon($this);
+        }
         if (null !== $this->aprimaryArtist) {
             $this->aprimaryArtist->removeCanon($this);
         }
@@ -2198,6 +2324,7 @@ abstract class Canon implements ActiveRecordInterface
         $this->name = null;
         $this->description = null;
         $this->primary_artist_id = null;
+        $this->work_type_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -2236,6 +2363,7 @@ abstract class Canon implements ActiveRecordInterface
         $this->collWorks = null;
         $this->collTopics = null;
         $this->collAssignedRoles = null;
+        $this->aworkType = null;
         $this->aprimaryArtist = null;
     }
 

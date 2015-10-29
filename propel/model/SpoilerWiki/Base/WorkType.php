@@ -16,8 +16,8 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use SpoilerWiki\Work as ChildWork;
-use SpoilerWiki\WorkQuery as ChildWorkQuery;
+use SpoilerWiki\Canon as ChildCanon;
+use SpoilerWiki\CanonQuery as ChildCanonQuery;
 use SpoilerWiki\WorkType as ChildWorkType;
 use SpoilerWiki\WorkTypeQuery as ChildWorkTypeQuery;
 use SpoilerWiki\Map\WorkTypeTableMap;
@@ -92,10 +92,10 @@ abstract class WorkType implements ActiveRecordInterface
     protected $milestone_label;
 
     /**
-     * @var        ObjectCollection|ChildWork[] Collection to store aggregation of ChildWork objects.
+     * @var        ObjectCollection|ChildCanon[] Collection to store aggregation of ChildCanon objects.
      */
-    protected $collWorks;
-    protected $collWorksPartial;
+    protected $collCanons;
+    protected $collCanonsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -107,9 +107,9 @@ abstract class WorkType implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildWork[]
+     * @var ObjectCollection|ChildCanon[]
      */
-    protected $worksScheduledForDeletion = null;
+    protected $canonsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of SpoilerWiki\Base\WorkType object.
@@ -569,7 +569,7 @@ abstract class WorkType implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collWorks = null;
+            $this->collCanons = null;
 
         } // if (deep)
     }
@@ -681,17 +681,17 @@ abstract class WorkType implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->worksScheduledForDeletion !== null) {
-                if (!$this->worksScheduledForDeletion->isEmpty()) {
-                    \SpoilerWiki\WorkQuery::create()
-                        ->filterByPrimaryKeys($this->worksScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->canonsScheduledForDeletion !== null) {
+                if (!$this->canonsScheduledForDeletion->isEmpty()) {
+                    \SpoilerWiki\CanonQuery::create()
+                        ->filterByPrimaryKeys($this->canonsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->worksScheduledForDeletion = null;
+                    $this->canonsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collWorks !== null) {
-                foreach ($this->collWorks as $referrerFK) {
+            if ($this->collCanons !== null) {
+                foreach ($this->collCanons as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -874,20 +874,20 @@ abstract class WorkType implements ActiveRecordInterface
         }
         
         if ($includeForeignObjects) {
-            if (null !== $this->collWorks) {
+            if (null !== $this->collCanons) {
                 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'works';
+                        $key = 'canons';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'works';
+                        $key = 'canons';
                         break;
                     default:
-                        $key = 'Works';
+                        $key = 'Canons';
                 }
         
-                $result[$key] = $this->collWorks->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->collCanons->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1121,9 +1121,9 @@ abstract class WorkType implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getWorks() as $relObj) {
+            foreach ($this->getCanons() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addWork($relObj->copy($deepCopy));
+                    $copyObj->addCanon($relObj->copy($deepCopy));
                 }
             }
 
@@ -1168,37 +1168,37 @@ abstract class WorkType implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Work' == $relationName) {
-            return $this->initWorks();
+        if ('Canon' == $relationName) {
+            return $this->initCanons();
         }
     }
 
     /**
-     * Clears out the collWorks collection
+     * Clears out the collCanons collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addWorks()
+     * @see        addCanons()
      */
-    public function clearWorks()
+    public function clearCanons()
     {
-        $this->collWorks = null; // important to set this to NULL since that means it is uninitialized
+        $this->collCanons = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collWorks collection loaded partially.
+     * Reset is the collCanons collection loaded partially.
      */
-    public function resetPartialWorks($v = true)
+    public function resetPartialCanons($v = true)
     {
-        $this->collWorksPartial = $v;
+        $this->collCanonsPartial = $v;
     }
 
     /**
-     * Initializes the collWorks collection.
+     * Initializes the collCanons collection.
      *
-     * By default this just sets the collWorks collection to an empty array (like clearcollWorks());
+     * By default this just sets the collCanons collection to an empty array (like clearcollCanons());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1207,17 +1207,17 @@ abstract class WorkType implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initWorks($overrideExisting = true)
+    public function initCanons($overrideExisting = true)
     {
-        if (null !== $this->collWorks && !$overrideExisting) {
+        if (null !== $this->collCanons && !$overrideExisting) {
             return;
         }
-        $this->collWorks = new ObjectCollection();
-        $this->collWorks->setModel('\SpoilerWiki\Work');
+        $this->collCanons = new ObjectCollection();
+        $this->collCanons->setModel('\SpoilerWiki\Canon');
     }
 
     /**
-     * Gets an array of ChildWork objects which contain a foreign key that references this object.
+     * Gets an array of ChildCanon objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1227,108 +1227,108 @@ abstract class WorkType implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
+     * @return ObjectCollection|ChildCanon[] List of ChildCanon objects
      * @throws PropelException
      */
-    public function getWorks(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getCanons(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
+        $partial = $this->collCanonsPartial && !$this->isNew();
+        if (null === $this->collCanons || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCanons) {
                 // return empty collection
-                $this->initWorks();
+                $this->initCanons();
             } else {
-                $collWorks = ChildWorkQuery::create(null, $criteria)
+                $collCanons = ChildCanonQuery::create(null, $criteria)
                     ->filterByworkType($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collWorksPartial && count($collWorks)) {
-                        $this->initWorks(false);
+                    if (false !== $this->collCanonsPartial && count($collCanons)) {
+                        $this->initCanons(false);
 
-                        foreach ($collWorks as $obj) {
-                            if (false == $this->collWorks->contains($obj)) {
-                                $this->collWorks->append($obj);
+                        foreach ($collCanons as $obj) {
+                            if (false == $this->collCanons->contains($obj)) {
+                                $this->collCanons->append($obj);
                             }
                         }
 
-                        $this->collWorksPartial = true;
+                        $this->collCanonsPartial = true;
                     }
 
-                    return $collWorks;
+                    return $collCanons;
                 }
 
-                if ($partial && $this->collWorks) {
-                    foreach ($this->collWorks as $obj) {
+                if ($partial && $this->collCanons) {
+                    foreach ($this->collCanons as $obj) {
                         if ($obj->isNew()) {
-                            $collWorks[] = $obj;
+                            $collCanons[] = $obj;
                         }
                     }
                 }
 
-                $this->collWorks = $collWorks;
-                $this->collWorksPartial = false;
+                $this->collCanons = $collCanons;
+                $this->collCanonsPartial = false;
             }
         }
 
-        return $this->collWorks;
+        return $this->collCanons;
     }
 
     /**
-     * Sets a collection of ChildWork objects related by a one-to-many relationship
+     * Sets a collection of ChildCanon objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $works A Propel collection.
+     * @param      Collection $canons A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return $this|ChildWorkType The current object (for fluent API support)
      */
-    public function setWorks(Collection $works, ConnectionInterface $con = null)
+    public function setCanons(Collection $canons, ConnectionInterface $con = null)
     {
-        /** @var ChildWork[] $worksToDelete */
-        $worksToDelete = $this->getWorks(new Criteria(), $con)->diff($works);
+        /** @var ChildCanon[] $canonsToDelete */
+        $canonsToDelete = $this->getCanons(new Criteria(), $con)->diff($canons);
 
         
-        $this->worksScheduledForDeletion = $worksToDelete;
+        $this->canonsScheduledForDeletion = $canonsToDelete;
 
-        foreach ($worksToDelete as $workRemoved) {
-            $workRemoved->setworkType(null);
+        foreach ($canonsToDelete as $canonRemoved) {
+            $canonRemoved->setworkType(null);
         }
 
-        $this->collWorks = null;
-        foreach ($works as $work) {
-            $this->addWork($work);
+        $this->collCanons = null;
+        foreach ($canons as $canon) {
+            $this->addCanon($canon);
         }
 
-        $this->collWorks = $works;
-        $this->collWorksPartial = false;
+        $this->collCanons = $canons;
+        $this->collCanonsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Work objects.
+     * Returns the number of related Canon objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related Work objects.
+     * @return int             Count of related Canon objects.
      * @throws PropelException
      */
-    public function countWorks(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countCanons(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
+        $partial = $this->collCanonsPartial && !$this->isNew();
+        if (null === $this->collCanons || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCanons) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getWorks());
+                return count($this->getCanons());
             }
 
-            $query = ChildWorkQuery::create(null, $criteria);
+            $query = ChildCanonQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1338,54 +1338,54 @@ abstract class WorkType implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collWorks);
+        return count($this->collCanons);
     }
 
     /**
-     * Method called to associate a ChildWork object to this object
-     * through the ChildWork foreign key attribute.
+     * Method called to associate a ChildCanon object to this object
+     * through the ChildCanon foreign key attribute.
      *
-     * @param  ChildWork $l ChildWork
+     * @param  ChildCanon $l ChildCanon
      * @return $this|\SpoilerWiki\WorkType The current object (for fluent API support)
      */
-    public function addWork(ChildWork $l)
+    public function addCanon(ChildCanon $l)
     {
-        if ($this->collWorks === null) {
-            $this->initWorks();
-            $this->collWorksPartial = true;
+        if ($this->collCanons === null) {
+            $this->initCanons();
+            $this->collCanonsPartial = true;
         }
 
-        if (!$this->collWorks->contains($l)) {
-            $this->doAddWork($l);
+        if (!$this->collCanons->contains($l)) {
+            $this->doAddCanon($l);
         }
 
         return $this;
     }
 
     /**
-     * @param ChildWork $work The ChildWork object to add.
+     * @param ChildCanon $canon The ChildCanon object to add.
      */
-    protected function doAddWork(ChildWork $work)
+    protected function doAddCanon(ChildCanon $canon)
     {
-        $this->collWorks[]= $work;
-        $work->setworkType($this);
+        $this->collCanons[]= $canon;
+        $canon->setworkType($this);
     }
 
     /**
-     * @param  ChildWork $work The ChildWork object to remove.
+     * @param  ChildCanon $canon The ChildCanon object to remove.
      * @return $this|ChildWorkType The current object (for fluent API support)
      */
-    public function removeWork(ChildWork $work)
+    public function removeCanon(ChildCanon $canon)
     {
-        if ($this->getWorks()->contains($work)) {
-            $pos = $this->collWorks->search($work);
-            $this->collWorks->remove($pos);
-            if (null === $this->worksScheduledForDeletion) {
-                $this->worksScheduledForDeletion = clone $this->collWorks;
-                $this->worksScheduledForDeletion->clear();
+        if ($this->getCanons()->contains($canon)) {
+            $pos = $this->collCanons->search($canon);
+            $this->collCanons->remove($pos);
+            if (null === $this->canonsScheduledForDeletion) {
+                $this->canonsScheduledForDeletion = clone $this->collCanons;
+                $this->canonsScheduledForDeletion->clear();
             }
-            $this->worksScheduledForDeletion[]= clone $work;
-            $work->setworkType(null);
+            $this->canonsScheduledForDeletion[]= clone $canon;
+            $canon->setworkType(null);
         }
 
         return $this;
@@ -1397,7 +1397,7 @@ abstract class WorkType implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this WorkType is new, it will return
      * an empty collection; or if this WorkType has previously
-     * been saved, it will retrieve related Works from storage.
+     * been saved, it will retrieve related Canons from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1406,39 +1406,14 @@ abstract class WorkType implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
+     * @return ObjectCollection|ChildCanon[] List of ChildCanon objects
      */
-    public function getWorksJoinprimaryArtist(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCanonsJoinprimaryArtist(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildWorkQuery::create(null, $criteria);
+        $query = ChildCanonQuery::create(null, $criteria);
         $query->joinWith('primaryArtist', $joinBehavior);
 
-        return $this->getWorks($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this WorkType is new, it will return
-     * an empty collection; or if this WorkType has previously
-     * been saved, it will retrieve related Works from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in WorkType.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
-     */
-    public function getWorksJoincanon(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildWorkQuery::create(null, $criteria);
-        $query->joinWith('canon', $joinBehavior);
-
-        return $this->getWorks($query, $con);
+        return $this->getCanons($query, $con);
     }
 
     /**
@@ -1470,14 +1445,14 @@ abstract class WorkType implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collWorks) {
-                foreach ($this->collWorks as $o) {
+            if ($this->collCanons) {
+                foreach ($this->collCanons as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        $this->collWorks = null;
+        $this->collCanons = null;
     }
 
     /**

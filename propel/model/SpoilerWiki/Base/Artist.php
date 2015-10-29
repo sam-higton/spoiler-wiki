@@ -1388,6 +1388,31 @@ abstract class Artist implements ActiveRecordInterface
         return $this;
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Artist is new, it will return
+     * an empty collection; or if this Artist has previously
+     * been saved, it will retrieve related Canons from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Artist.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildCanon[] List of ChildCanon objects
+     */
+    public function getCanonsJoinworkType(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCanonQuery::create(null, $criteria);
+        $query->joinWith('workType', $joinBehavior);
+
+        return $this->getCanons($query, $con);
+    }
+
     /**
      * Clears out the collWorks collection
      *
@@ -1627,31 +1652,6 @@ abstract class Artist implements ActiveRecordInterface
     {
         $query = ChildWorkQuery::create(null, $criteria);
         $query->joinWith('canon', $joinBehavior);
-
-        return $this->getWorks($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Artist is new, it will return
-     * an empty collection; or if this Artist has previously
-     * been saved, it will retrieve related Works from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Artist.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildWork[] List of ChildWork objects
-     */
-    public function getWorksJoinworkType(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildWorkQuery::create(null, $criteria);
-        $query->joinWith('workType', $joinBehavior);
 
         return $this->getWorks($query, $con);
     }

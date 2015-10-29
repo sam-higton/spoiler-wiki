@@ -39,7 +39,7 @@ class SnippetTableMap extends TableMap
     /**
      * The default database name for this class
      */
-    const DATABASE_NAME = 'spoilerwiki-local';
+    const DATABASE_NAME = 'spoilerwiki-remote';
 
     /**
      * The table name for this class
