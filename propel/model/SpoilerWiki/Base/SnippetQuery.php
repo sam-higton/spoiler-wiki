@@ -21,12 +21,10 @@ use SpoilerWiki\Map\SnippetTableMap;
  * 
  *
  * @method     ChildSnippetQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildSnippetQuery orderByContent($order = Criteria::ASC) Order by the content column
  * @method     ChildSnippetQuery orderByTopicId($order = Criteria::ASC) Order by the topic_id column
  * @method     ChildSnippetQuery orderByIntroducedAt($order = Criteria::ASC) Order by the introduced_at column
  *
  * @method     ChildSnippetQuery groupById() Group by the id column
- * @method     ChildSnippetQuery groupByContent() Group by the content column
  * @method     ChildSnippetQuery groupByTopicId() Group by the topic_id column
  * @method     ChildSnippetQuery groupByIntroducedAt() Group by the introduced_at column
  *
@@ -58,13 +56,22 @@ use SpoilerWiki\Map\SnippetTableMap;
  * @method     ChildSnippetQuery rightJoinWithintroducedAt() Adds a RIGHT JOIN clause and with to the query using the introducedAt relation
  * @method     ChildSnippetQuery innerJoinWithintroducedAt() Adds a INNER JOIN clause and with to the query using the introducedAt relation
  *
- * @method     \SpoilerWiki\TopicQuery|\SpoilerWiki\MilestoneQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildSnippetQuery leftJoinContentArea($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentArea relation
+ * @method     ChildSnippetQuery rightJoinContentArea($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentArea relation
+ * @method     ChildSnippetQuery innerJoinContentArea($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentArea relation
+ *
+ * @method     ChildSnippetQuery joinWithContentArea($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the ContentArea relation
+ *
+ * @method     ChildSnippetQuery leftJoinWithContentArea() Adds a LEFT JOIN clause and with to the query using the ContentArea relation
+ * @method     ChildSnippetQuery rightJoinWithContentArea() Adds a RIGHT JOIN clause and with to the query using the ContentArea relation
+ * @method     ChildSnippetQuery innerJoinWithContentArea() Adds a INNER JOIN clause and with to the query using the ContentArea relation
+ *
+ * @method     \SpoilerWiki\TopicQuery|\SpoilerWiki\MilestoneQuery|\SpoilerWiki\ContentAreaQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildSnippet findOne(ConnectionInterface $con = null) Return the first ChildSnippet matching the query
  * @method     ChildSnippet findOneOrCreate(ConnectionInterface $con = null) Return the first ChildSnippet matching the query, or a new ChildSnippet object populated from the query conditions when no match is found
  *
  * @method     ChildSnippet findOneById(int $id) Return the first ChildSnippet filtered by the id column
- * @method     ChildSnippet findOneByContent(string $content) Return the first ChildSnippet filtered by the content column
  * @method     ChildSnippet findOneByTopicId(int $topic_id) Return the first ChildSnippet filtered by the topic_id column
  * @method     ChildSnippet findOneByIntroducedAt(int $introduced_at) Return the first ChildSnippet filtered by the introduced_at column *
 
@@ -72,13 +79,11 @@ use SpoilerWiki\Map\SnippetTableMap;
  * @method     ChildSnippet requireOne(ConnectionInterface $con = null) Return the first ChildSnippet matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildSnippet requireOneById(int $id) Return the first ChildSnippet filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildSnippet requireOneByContent(string $content) Return the first ChildSnippet filtered by the content column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildSnippet requireOneByTopicId(int $topic_id) Return the first ChildSnippet filtered by the topic_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildSnippet requireOneByIntroducedAt(int $introduced_at) Return the first ChildSnippet filtered by the introduced_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildSnippet[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildSnippet objects based on current ModelCriteria
  * @method     ChildSnippet[]|ObjectCollection findById(int $id) Return ChildSnippet objects filtered by the id column
- * @method     ChildSnippet[]|ObjectCollection findByContent(string $content) Return ChildSnippet objects filtered by the content column
  * @method     ChildSnippet[]|ObjectCollection findByTopicId(int $topic_id) Return ChildSnippet objects filtered by the topic_id column
  * @method     ChildSnippet[]|ObjectCollection findByIntroducedAt(int $introduced_at) Return ChildSnippet objects filtered by the introduced_at column
  * @method     ChildSnippet[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -86,7 +91,19 @@ use SpoilerWiki\Map\SnippetTableMap;
  */
 abstract class SnippetQuery extends ModelCriteria
 {
-    protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
+    
+    // delegate behavior
+    
+    protected $delegatedFields = [
+        'Content' => 'ContentArea',
+        'activeVersion' => 'ContentArea',
+        'Version' => 'ContentArea',
+        'VersionCreatedAt' => 'ContentArea',
+        'VersionCreatedBy' => 'ContentArea',
+        'VersionComment' => 'ContentArea',
+    ];
+    
+protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
      * Initializes internal state of \SpoilerWiki\Base\SnippetQuery object.
@@ -173,7 +190,7 @@ abstract class SnippetQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT `id`, `content`, `topic_id`, `introduced_at` FROM `snippet` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `topic_id`, `introduced_at` FROM `snippet` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -302,35 +319,6 @@ abstract class SnippetQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(SnippetTableMap::COL_ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query on the content column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByContent('fooValue');   // WHERE content = 'fooValue'
-     * $query->filterByContent('%fooValue%'); // WHERE content LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $content The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildSnippetQuery The current query, for fluid interface
-     */
-    public function filterByContent($content = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($content)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $content)) {
-                $content = str_replace('*', '%', $content);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(SnippetTableMap::COL_CONTENT, $content, $comparison);
     }
 
     /**
@@ -574,6 +562,79 @@ abstract class SnippetQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \SpoilerWiki\ContentArea object
+     *
+     * @param \SpoilerWiki\ContentArea|ObjectCollection $contentArea the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildSnippetQuery The current query, for fluid interface
+     */
+    public function filterByContentArea($contentArea, $comparison = null)
+    {
+        if ($contentArea instanceof \SpoilerWiki\ContentArea) {
+            return $this
+                ->addUsingAlias(SnippetTableMap::COL_ID, $contentArea->getId(), $comparison);
+        } elseif ($contentArea instanceof ObjectCollection) {
+            return $this
+                ->useContentAreaQuery()
+                ->filterByPrimaryKeys($contentArea->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByContentArea() only accepts arguments of type \SpoilerWiki\ContentArea or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ContentArea relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildSnippetQuery The current query, for fluid interface
+     */
+    public function joinContentArea($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ContentArea');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ContentArea');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ContentArea relation ContentArea object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \SpoilerWiki\ContentAreaQuery A secondary query class using the current class as primary query
+     */
+    public function useContentAreaQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinContentArea($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ContentArea', '\SpoilerWiki\ContentAreaQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildSnippet $snippet Object to remove from the list of results
@@ -648,6 +709,281 @@ abstract class SnippetQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // delegate behavior
+    /**
+    * Filter the query by content column
+    *
+    * Example usage:
+    * <code>
+        * $query->filterByContent(1234); // WHERE content = 1234
+        * $query->filterByContent(array(12, 34)); // WHERE content IN (12, 34)
+        * $query->filterByContent(array('min' => 12)); // WHERE content > 12
+        * </code>
+    *
+    * @param     mixed $value The value to use as filter.
+    *              Use scalar values for equality.
+    *              Use array values for in_array() equivalent.
+    *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+    * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+    *
+    * @return $this|ChildSnippetQuery The current query, for fluid interface
+    */
+    public function filterByContent($value = null, $comparison = null)
+    {
+        return $this->useContentAreaQuery()->filterByContent($value, $comparison)->endUse();
+    }
+    
+    /**
+    * Adds an ORDER BY clause to the query
+    * Usability layer on top of Criteria::addAscendingOrderByColumn() and Criteria::addDescendingOrderByColumn()
+    * Infers $column and $order from $columnName and some optional arguments
+    * Examples:
+    *   $c->orderBy('Book.CreatedAt')
+    *    => $c->addAscendingOrderByColumn(BookTableMap::CREATED_AT)
+    *   $c->orderBy('Book.CategoryId', 'desc')
+    *    => $c->addDescendingOrderByColumn(BookTableMap::CATEGORY_ID)
+    *
+    * @param string $order      The sorting order. Criteria::ASC by default, also accepts Criteria::DESC
+    *
+    * @return $this|ModelCriteria The current object, for fluid interface
+    */
+    public function orderByContent($order = Criteria::ASC)
+    {
+        return $this->useContentAreaQuery()->orderByContent($order)->endUse();
+    }
+    /**
+    * Filter the query by active_version column
+    *
+    * Example usage:
+    * <code>
+        * $query->filterByactiveVersion(1234); // WHERE active_version = 1234
+        * $query->filterByactiveVersion(array(12, 34)); // WHERE active_version IN (12, 34)
+        * $query->filterByactiveVersion(array('min' => 12)); // WHERE active_version > 12
+        * </code>
+    *
+    * @param     mixed $value The value to use as filter.
+    *              Use scalar values for equality.
+    *              Use array values for in_array() equivalent.
+    *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+    * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+    *
+    * @return $this|ChildSnippetQuery The current query, for fluid interface
+    */
+    public function filterByactiveVersion($value = null, $comparison = null)
+    {
+        return $this->useContentAreaQuery()->filterByactiveVersion($value, $comparison)->endUse();
+    }
+    
+    /**
+    * Adds an ORDER BY clause to the query
+    * Usability layer on top of Criteria::addAscendingOrderByColumn() and Criteria::addDescendingOrderByColumn()
+    * Infers $column and $order from $columnName and some optional arguments
+    * Examples:
+    *   $c->orderBy('Book.CreatedAt')
+    *    => $c->addAscendingOrderByColumn(BookTableMap::CREATED_AT)
+    *   $c->orderBy('Book.CategoryId', 'desc')
+    *    => $c->addDescendingOrderByColumn(BookTableMap::CATEGORY_ID)
+    *
+    * @param string $order      The sorting order. Criteria::ASC by default, also accepts Criteria::DESC
+    *
+    * @return $this|ModelCriteria The current object, for fluid interface
+    */
+    public function orderByactiveVersion($order = Criteria::ASC)
+    {
+        return $this->useContentAreaQuery()->orderByactiveVersion($order)->endUse();
+    }
+    /**
+    * Filter the query by version column
+    *
+    * Example usage:
+    * <code>
+        * $query->filterByVersion(1234); // WHERE version = 1234
+        * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
+        * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+        * </code>
+    *
+    * @param     mixed $value The value to use as filter.
+    *              Use scalar values for equality.
+    *              Use array values for in_array() equivalent.
+    *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+    * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+    *
+    * @return $this|ChildSnippetQuery The current query, for fluid interface
+    */
+    public function filterByVersion($value = null, $comparison = null)
+    {
+        return $this->useContentAreaQuery()->filterByVersion($value, $comparison)->endUse();
+    }
+    
+    /**
+    * Adds an ORDER BY clause to the query
+    * Usability layer on top of Criteria::addAscendingOrderByColumn() and Criteria::addDescendingOrderByColumn()
+    * Infers $column and $order from $columnName and some optional arguments
+    * Examples:
+    *   $c->orderBy('Book.CreatedAt')
+    *    => $c->addAscendingOrderByColumn(BookTableMap::CREATED_AT)
+    *   $c->orderBy('Book.CategoryId', 'desc')
+    *    => $c->addDescendingOrderByColumn(BookTableMap::CATEGORY_ID)
+    *
+    * @param string $order      The sorting order. Criteria::ASC by default, also accepts Criteria::DESC
+    *
+    * @return $this|ModelCriteria The current object, for fluid interface
+    */
+    public function orderByVersion($order = Criteria::ASC)
+    {
+        return $this->useContentAreaQuery()->orderByVersion($order)->endUse();
+    }
+    /**
+    * Filter the query by version_created_at column
+    *
+    * Example usage:
+    * <code>
+        * $query->filterByVersionCreatedAt(1234); // WHERE version_created_at = 1234
+        * $query->filterByVersionCreatedAt(array(12, 34)); // WHERE version_created_at IN (12, 34)
+        * $query->filterByVersionCreatedAt(array('min' => 12)); // WHERE version_created_at > 12
+        * </code>
+    *
+    * @param     mixed $value The value to use as filter.
+    *              Use scalar values for equality.
+    *              Use array values for in_array() equivalent.
+    *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+    * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+    *
+    * @return $this|ChildSnippetQuery The current query, for fluid interface
+    */
+    public function filterByVersionCreatedAt($value = null, $comparison = null)
+    {
+        return $this->useContentAreaQuery()->filterByVersionCreatedAt($value, $comparison)->endUse();
+    }
+    
+    /**
+    * Adds an ORDER BY clause to the query
+    * Usability layer on top of Criteria::addAscendingOrderByColumn() and Criteria::addDescendingOrderByColumn()
+    * Infers $column and $order from $columnName and some optional arguments
+    * Examples:
+    *   $c->orderBy('Book.CreatedAt')
+    *    => $c->addAscendingOrderByColumn(BookTableMap::CREATED_AT)
+    *   $c->orderBy('Book.CategoryId', 'desc')
+    *    => $c->addDescendingOrderByColumn(BookTableMap::CATEGORY_ID)
+    *
+    * @param string $order      The sorting order. Criteria::ASC by default, also accepts Criteria::DESC
+    *
+    * @return $this|ModelCriteria The current object, for fluid interface
+    */
+    public function orderByVersionCreatedAt($order = Criteria::ASC)
+    {
+        return $this->useContentAreaQuery()->orderByVersionCreatedAt($order)->endUse();
+    }
+    /**
+    * Filter the query by version_created_by column
+    *
+    * Example usage:
+    * <code>
+        * $query->filterByVersionCreatedBy(1234); // WHERE version_created_by = 1234
+        * $query->filterByVersionCreatedBy(array(12, 34)); // WHERE version_created_by IN (12, 34)
+        * $query->filterByVersionCreatedBy(array('min' => 12)); // WHERE version_created_by > 12
+        * </code>
+    *
+    * @param     mixed $value The value to use as filter.
+    *              Use scalar values for equality.
+    *              Use array values for in_array() equivalent.
+    *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+    * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+    *
+    * @return $this|ChildSnippetQuery The current query, for fluid interface
+    */
+    public function filterByVersionCreatedBy($value = null, $comparison = null)
+    {
+        return $this->useContentAreaQuery()->filterByVersionCreatedBy($value, $comparison)->endUse();
+    }
+    
+    /**
+    * Adds an ORDER BY clause to the query
+    * Usability layer on top of Criteria::addAscendingOrderByColumn() and Criteria::addDescendingOrderByColumn()
+    * Infers $column and $order from $columnName and some optional arguments
+    * Examples:
+    *   $c->orderBy('Book.CreatedAt')
+    *    => $c->addAscendingOrderByColumn(BookTableMap::CREATED_AT)
+    *   $c->orderBy('Book.CategoryId', 'desc')
+    *    => $c->addDescendingOrderByColumn(BookTableMap::CATEGORY_ID)
+    *
+    * @param string $order      The sorting order. Criteria::ASC by default, also accepts Criteria::DESC
+    *
+    * @return $this|ModelCriteria The current object, for fluid interface
+    */
+    public function orderByVersionCreatedBy($order = Criteria::ASC)
+    {
+        return $this->useContentAreaQuery()->orderByVersionCreatedBy($order)->endUse();
+    }
+    /**
+    * Filter the query by version_comment column
+    *
+    * Example usage:
+    * <code>
+        * $query->filterByVersionComment(1234); // WHERE version_comment = 1234
+        * $query->filterByVersionComment(array(12, 34)); // WHERE version_comment IN (12, 34)
+        * $query->filterByVersionComment(array('min' => 12)); // WHERE version_comment > 12
+        * </code>
+    *
+    * @param     mixed $value The value to use as filter.
+    *              Use scalar values for equality.
+    *              Use array values for in_array() equivalent.
+    *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+    * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+    *
+    * @return $this|ChildSnippetQuery The current query, for fluid interface
+    */
+    public function filterByVersionComment($value = null, $comparison = null)
+    {
+        return $this->useContentAreaQuery()->filterByVersionComment($value, $comparison)->endUse();
+    }
+    
+    /**
+    * Adds an ORDER BY clause to the query
+    * Usability layer on top of Criteria::addAscendingOrderByColumn() and Criteria::addDescendingOrderByColumn()
+    * Infers $column and $order from $columnName and some optional arguments
+    * Examples:
+    *   $c->orderBy('Book.CreatedAt')
+    *    => $c->addAscendingOrderByColumn(BookTableMap::CREATED_AT)
+    *   $c->orderBy('Book.CategoryId', 'desc')
+    *    => $c->addDescendingOrderByColumn(BookTableMap::CATEGORY_ID)
+    *
+    * @param string $order      The sorting order. Criteria::ASC by default, also accepts Criteria::DESC
+    *
+    * @return $this|ModelCriteria The current object, for fluid interface
+    */
+    public function orderByVersionComment($order = Criteria::ASC)
+    {
+        return $this->useContentAreaQuery()->orderByVersionComment($order)->endUse();
+    }
+    
+    /**
+     * Adds a condition on a column based on a column phpName and a value
+     * Uses introspection to translate the column phpName into a fully qualified name
+     * Warning: recognizes only the phpNames of the main Model (not joined tables)
+     * <code>
+     * $c->filterBy('Title', 'foo');
+     * </code>
+     *
+     * @see Criteria::add()
+     *
+     * @param string $column     A string representing thecolumn phpName, e.g. 'AuthorId'
+     * @param mixed  $value      A value for the condition
+     * @param string $comparison What to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ModelCriteria The current object, for fluid interface
+     */
+    public function filterBy($column, $value, $comparison = Criteria::EQUAL)
+    {
+        if (isset($this->delegatedFields[$column])) {
+            $methodUse = "use{$this->delegatedFields[$column]}Query";
+    
+            return $this->{$methodUse}()->filterBy($column, $value, $comparison)->endUse();
+        } else {
+            return $this->add($this->getRealColumnName($column), $value, $comparison);
+        }
     }
 
 } // SnippetQuery

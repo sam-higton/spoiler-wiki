@@ -59,7 +59,7 @@ class SnippetTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -69,17 +69,12 @@ class SnippetTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the id field
      */
     const COL_ID = 'snippet.id';
-
-    /**
-     * the column name for the content field
-     */
-    const COL_CONTENT = 'snippet.content';
 
     /**
      * the column name for the topic_id field
@@ -103,11 +98,11 @@ class SnippetTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Content', 'TopicId', 'IntroducedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'content', 'topicId', 'introducedAt', ),
-        self::TYPE_COLNAME       => array(SnippetTableMap::COL_ID, SnippetTableMap::COL_CONTENT, SnippetTableMap::COL_TOPIC_ID, SnippetTableMap::COL_INTRODUCED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'content', 'topic_id', 'introduced_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'TopicId', 'IntroducedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'topicId', 'introducedAt', ),
+        self::TYPE_COLNAME       => array(SnippetTableMap::COL_ID, SnippetTableMap::COL_TOPIC_ID, SnippetTableMap::COL_INTRODUCED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'topic_id', 'introduced_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -117,11 +112,11 @@ class SnippetTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Content' => 1, 'TopicId' => 2, 'IntroducedAt' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'content' => 1, 'topicId' => 2, 'introducedAt' => 3, ),
-        self::TYPE_COLNAME       => array(SnippetTableMap::COL_ID => 0, SnippetTableMap::COL_CONTENT => 1, SnippetTableMap::COL_TOPIC_ID => 2, SnippetTableMap::COL_INTRODUCED_AT => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'content' => 1, 'topic_id' => 2, 'introduced_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'TopicId' => 1, 'IntroducedAt' => 2, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'topicId' => 1, 'introducedAt' => 2, ),
+        self::TYPE_COLNAME       => array(SnippetTableMap::COL_ID => 0, SnippetTableMap::COL_TOPIC_ID => 1, SnippetTableMap::COL_INTRODUCED_AT => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'topic_id' => 1, 'introduced_at' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -142,7 +137,6 @@ class SnippetTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('content', 'Content', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('topic_id', 'TopicId', 'INTEGER', 'topic', 'id', true, null, null);
         $this->addForeignKey('introduced_at', 'IntroducedAt', 'INTEGER', 'milestone', 'id', true, null, null);
     } // initialize()
@@ -166,7 +160,36 @@ class SnippetTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('ContentArea', '\\SpoilerWiki\\ContentArea', RelationMap::ONE_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'delegate' => array('to' => 'content_area', ),
+        );
+    } // getBehaviors()
+    /**
+     * Method to invalidate the instance pool of all tables related to snippet     * by a foreign key with ON DELETE CASCADE
+     */
+    public static function clearRelatedInstancePool()
+    {
+        // Invalidate objects in related instance pools,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ContentAreaTableMap::clearInstancePool();
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -310,12 +333,10 @@ class SnippetTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(SnippetTableMap::COL_ID);
-            $criteria->addSelectColumn(SnippetTableMap::COL_CONTENT);
             $criteria->addSelectColumn(SnippetTableMap::COL_TOPIC_ID);
             $criteria->addSelectColumn(SnippetTableMap::COL_INTRODUCED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.content');
             $criteria->addSelectColumn($alias . '.topic_id');
             $criteria->addSelectColumn($alias . '.introduced_at');
         }

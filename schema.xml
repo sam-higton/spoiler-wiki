@@ -70,9 +70,11 @@
     </table>
     <table name="snippet" phpName="Snippet">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="content" type="longvarchar" requred="true" />
         <column name="topic_id" type="integer" required="true"  />
         <column name="introduced_at" type="integer" required="true"  />
+        <behavior name="delegate">
+            <parameter name="to" value="content_area" />
+        </behavior>
         <!-- foreign keys -->
         <foreign-key foreignTable="topic" phpName="topic">
             <reference local="topic_id" foreign="id" />
@@ -83,9 +85,11 @@
     </table>
     <table name="summary" phpName="Summary">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="content" type="longvarchar" required="true" />
         <column name="topic_id" type="integer" required="true"  />
         <column name="introduced_at" type="integer" required="true"  />
+        <behavior name="delegate">
+            <parameter name="to" value="content_area" />
+        </behavior>
         <!-- foreign keys -->
         <foreign-key foreignTable="topic" phpName="topic">
             <reference local="topic_id" foreign="id" />
@@ -93,6 +97,16 @@
         <foreign-key foreignTable="milestone" phpName="updatedAt">
             <reference local="introduced_at" foreign="id" />
         </foreign-key>
+    </table>
+
+    <table name="content_area" phpName="ContentArea">
+        <column name="content" type="longvarchar" required="true" />
+        <column name="active_version" type="integer" phpName="activeVersion" defaultValue="1" />
+        <behavior name="versionable">
+            <parameter name="log_created_at" value="true" />
+            <parameter name="log_created_by" value="true" />
+            <parameter name="log_comment" value="true" />
+        </behavior>
     </table>
 
     <!-- user auth tables -->

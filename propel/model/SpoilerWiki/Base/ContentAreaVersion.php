@@ -2,6 +2,7 @@
 
 namespace SpoilerWiki\Base;
 
+use \DateTime;
 use \Exception;
 use \PDO;
 use Propel\Runtime\Propel;
@@ -15,28 +16,25 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Util\PropelDateTime;
 use SpoilerWiki\ContentArea as ChildContentArea;
 use SpoilerWiki\ContentAreaQuery as ChildContentAreaQuery;
-use SpoilerWiki\Milestone as ChildMilestone;
-use SpoilerWiki\MilestoneQuery as ChildMilestoneQuery;
-use SpoilerWiki\SummaryQuery as ChildSummaryQuery;
-use SpoilerWiki\Topic as ChildTopic;
-use SpoilerWiki\TopicQuery as ChildTopicQuery;
-use SpoilerWiki\Map\SummaryTableMap;
+use SpoilerWiki\ContentAreaVersionQuery as ChildContentAreaVersionQuery;
+use SpoilerWiki\Map\ContentAreaVersionTableMap;
 
 /**
- * Base class that represents a row from the 'summary' table.
+ * Base class that represents a row from the 'content_area_version' table.
  *
  * 
  *
 * @package    propel.generator.SpoilerWiki.Base
 */
-abstract class Summary implements ActiveRecordInterface 
+abstract class ContentAreaVersion implements ActiveRecordInterface 
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\SpoilerWiki\\Map\\SummaryTableMap';
+    const TABLE_MAP = '\\SpoilerWiki\\Map\\ContentAreaVersionTableMap';
 
 
     /**
@@ -66,6 +64,21 @@ abstract class Summary implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
+     * The value for the content field.
+     * 
+     * @var        string
+     */
+    protected $content;
+
+    /**
+     * The value for the active_version field.
+     * 
+     * Note: this column has a database default value of: 1
+     * @var        int
+     */
+    protected $active_version;
+
+    /**
      * The value for the id field.
      * 
      * @var        int
@@ -73,33 +86,38 @@ abstract class Summary implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the topic_id field.
+     * The value for the version field.
      * 
+     * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $topic_id;
+    protected $version;
 
     /**
-     * The value for the introduced_at field.
+     * The value for the version_created_at field.
      * 
-     * @var        int
+     * @var        \DateTime
      */
-    protected $introduced_at;
+    protected $version_created_at;
 
     /**
-     * @var        ChildTopic
+     * The value for the version_created_by field.
+     * 
+     * @var        string
      */
-    protected $atopic;
+    protected $version_created_by;
 
     /**
-     * @var        ChildMilestone
+     * The value for the version_comment field.
+     * 
+     * @var        string
      */
-    protected $aupdatedAt;
+    protected $version_comment;
 
     /**
-     * @var        ChildContentArea one-to-one related ChildContentArea object
+     * @var        ChildContentArea
      */
-    protected $singleContentArea;
+    protected $aContentArea;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -110,10 +128,24 @@ abstract class Summary implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of SpoilerWiki\Base\Summary object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->active_version = 1;
+        $this->version = 0;
+    }
+
+    /**
+     * Initializes internal state of SpoilerWiki\Base\ContentAreaVersion object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -205,9 +237,9 @@ abstract class Summary implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Summary</code> instance.  If
-     * <code>obj</code> is an instance of <code>Summary</code>, delegates to
-     * <code>equals(Summary)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ContentAreaVersion</code> instance.  If
+     * <code>obj</code> is an instance of <code>ContentAreaVersion</code>, delegates to
+     * <code>equals(ContentAreaVersion)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -273,7 +305,7 @@ abstract class Summary implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Summary The current object, for fluid interface
+     * @return $this|ContentAreaVersion The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -332,6 +364,26 @@ abstract class Summary implements ActiveRecordInterface
     }
 
     /**
+     * Get the [content] column value.
+     * 
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * Get the [active_version] column value.
+     * 
+     * @return int
+     */
+    public function getactiveVersion()
+    {
+        return $this->active_version;
+    }
+
+    /**
      * Get the [id] column value.
      * 
      * @return int
@@ -342,30 +394,100 @@ abstract class Summary implements ActiveRecordInterface
     }
 
     /**
-     * Get the [topic_id] column value.
+     * Get the [version] column value.
      * 
      * @return int
      */
-    public function getTopicId()
+    public function getVersion()
     {
-        return $this->topic_id;
+        return $this->version;
     }
 
     /**
-     * Get the [introduced_at] column value.
+     * Get the [optionally formatted] temporal [version_created_at] column value.
      * 
-     * @return int
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getIntroducedAt()
+    public function getVersionCreatedAt($format = NULL)
     {
-        return $this->introduced_at;
+        if ($format === null) {
+            return $this->version_created_at;
+        } else {
+            return $this->version_created_at instanceof \DateTime ? $this->version_created_at->format($format) : null;
+        }
     }
+
+    /**
+     * Get the [version_created_by] column value.
+     * 
+     * @return string
+     */
+    public function getVersionCreatedBy()
+    {
+        return $this->version_created_by;
+    }
+
+    /**
+     * Get the [version_comment] column value.
+     * 
+     * @return string
+     */
+    public function getVersionComment()
+    {
+        return $this->version_comment;
+    }
+
+    /**
+     * Set the value of [content] column.
+     * 
+     * @param string $v new value
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
+     */
+    public function setContent($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->content !== $v) {
+            $this->content = $v;
+            $this->modifiedColumns[ContentAreaVersionTableMap::COL_CONTENT] = true;
+        }
+
+        return $this;
+    } // setContent()
+
+    /**
+     * Set the value of [active_version] column.
+     * 
+     * @param int $v new value
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
+     */
+    public function setactiveVersion($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->active_version !== $v) {
+            $this->active_version = $v;
+            $this->modifiedColumns[ContentAreaVersionTableMap::COL_ACTIVE_VERSION] = true;
+        }
+
+        return $this;
+    } // setactiveVersion()
 
     /**
      * Set the value of [id] column.
      * 
      * @param int $v new value
-     * @return $this|\SpoilerWiki\Summary The current object (for fluent API support)
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -375,59 +497,95 @@ abstract class Summary implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[SummaryTableMap::COL_ID] = true;
+            $this->modifiedColumns[ContentAreaVersionTableMap::COL_ID] = true;
+        }
+
+        if ($this->aContentArea !== null && $this->aContentArea->getId() !== $v) {
+            $this->aContentArea = null;
         }
 
         return $this;
     } // setId()
 
     /**
-     * Set the value of [topic_id] column.
+     * Set the value of [version] column.
      * 
      * @param int $v new value
-     * @return $this|\SpoilerWiki\Summary The current object (for fluent API support)
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
      */
-    public function setTopicId($v)
+    public function setVersion($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->topic_id !== $v) {
-            $this->topic_id = $v;
-            $this->modifiedColumns[SummaryTableMap::COL_TOPIC_ID] = true;
-        }
-
-        if ($this->atopic !== null && $this->atopic->getId() !== $v) {
-            $this->atopic = null;
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[ContentAreaVersionTableMap::COL_VERSION] = true;
         }
 
         return $this;
-    } // setTopicId()
+    } // setVersion()
 
     /**
-     * Set the value of [introduced_at] column.
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
      * 
-     * @param int $v new value
-     * @return $this|\SpoilerWiki\Summary The current object (for fluent API support)
+     * @param  mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
      */
-    public function setIntroducedAt($v)
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            if ($this->version_created_at === null || $dt === null || $dt->format("Y-m-d H:i:s") !== $this->version_created_at->format("Y-m-d H:i:s")) {
+                $this->version_created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ContentAreaVersionTableMap::COL_VERSION_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     * 
+     * @param string $v new value
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->introduced_at !== $v) {
-            $this->introduced_at = $v;
-            $this->modifiedColumns[SummaryTableMap::COL_INTRODUCED_AT] = true;
-        }
-
-        if ($this->aupdatedAt !== null && $this->aupdatedAt->getId() !== $v) {
-            $this->aupdatedAt = null;
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[ContentAreaVersionTableMap::COL_VERSION_CREATED_BY] = true;
         }
 
         return $this;
-    } // setIntroducedAt()
+    } // setVersionCreatedBy()
+
+    /**
+     * Set the value of [version_comment] column.
+     * 
+     * @param string $v new value
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
+     */
+    public function setVersionComment($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_comment !== $v) {
+            $this->version_comment = $v;
+            $this->modifiedColumns[ContentAreaVersionTableMap::COL_VERSION_COMMENT] = true;
+        }
+
+        return $this;
+    } // setVersionComment()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -439,6 +597,14 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->active_version !== 1) {
+                return false;
+            }
+
+            if ($this->version !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -465,14 +631,29 @@ abstract class Summary implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SummaryTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ContentAreaVersionTableMap::translateFieldName('Content', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->content = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContentAreaVersionTableMap::translateFieldName('activeVersion', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->active_version = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContentAreaVersionTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SummaryTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->topic_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContentAreaVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SummaryTableMap::translateFieldName('IntroducedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->introduced_at = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContentAreaVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContentAreaVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version_created_by = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ContentAreaVersionTableMap::translateFieldName('VersionComment', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version_comment = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -481,10 +662,10 @@ abstract class Summary implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = SummaryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ContentAreaVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\SpoilerWiki\\Summary'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\SpoilerWiki\\ContentAreaVersion'), 0, $e);
         }
     }
 
@@ -503,11 +684,8 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->atopic !== null && $this->topic_id !== $this->atopic->getId()) {
-            $this->atopic = null;
-        }
-        if ($this->aupdatedAt !== null && $this->introduced_at !== $this->aupdatedAt->getId()) {
-            $this->aupdatedAt = null;
+        if ($this->aContentArea !== null && $this->id !== $this->aContentArea->getId()) {
+            $this->aContentArea = null;
         }
     } // ensureConsistency
 
@@ -532,13 +710,13 @@ abstract class Summary implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(SummaryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ContentAreaVersionTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildSummaryQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildContentAreaVersionQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -548,10 +726,7 @@ abstract class Summary implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->atopic = null;
-            $this->aupdatedAt = null;
-            $this->singleContentArea = null;
-
+            $this->aContentArea = null;
         } // if (deep)
     }
 
@@ -561,8 +736,8 @@ abstract class Summary implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Summary::setDeleted()
-     * @see Summary::isDeleted()
+     * @see ContentAreaVersion::setDeleted()
+     * @see ContentAreaVersion::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -571,11 +746,11 @@ abstract class Summary implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(SummaryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ContentAreaVersionTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildSummaryQuery::create()
+            $deleteQuery = ChildContentAreaVersionQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -606,7 +781,7 @@ abstract class Summary implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(SummaryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ContentAreaVersionTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -625,7 +800,7 @@ abstract class Summary implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                SummaryTableMap::addInstanceToPool($this);
+                ContentAreaVersionTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -656,18 +831,11 @@ abstract class Summary implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->atopic !== null) {
-                if ($this->atopic->isModified() || $this->atopic->isNew()) {
-                    $affectedRows += $this->atopic->save($con);
+            if ($this->aContentArea !== null) {
+                if ($this->aContentArea->isModified() || $this->aContentArea->isNew()) {
+                    $affectedRows += $this->aContentArea->save($con);
                 }
-                $this->settopic($this->atopic);
-            }
-
-            if ($this->aupdatedAt !== null) {
-                if ($this->aupdatedAt->isModified() || $this->aupdatedAt->isNew()) {
-                    $affectedRows += $this->aupdatedAt->save($con);
-                }
-                $this->setupdatedAt($this->aupdatedAt);
+                $this->setContentArea($this->aContentArea);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -679,12 +847,6 @@ abstract class Summary implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
-            }
-
-            if ($this->singleContentArea !== null) {
-                if (!$this->singleContentArea->isDeleted() && ($this->singleContentArea->isNew() || $this->singleContentArea->isModified())) {
-                    $affectedRows += $this->singleContentArea->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -707,24 +869,32 @@ abstract class Summary implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[SummaryTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . SummaryTableMap::COL_ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(SummaryTableMap::COL_ID)) {
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_CONTENT)) {
+            $modifiedColumns[':p' . $index++]  = '`content`';
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_ACTIVE_VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`active_version`';
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(SummaryTableMap::COL_TOPIC_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`topic_id`';
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`version`';
         }
-        if ($this->isColumnModified(SummaryTableMap::COL_INTRODUCED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`introduced_at`';
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`version_created_at`';
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`version_created_by`';
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION_COMMENT)) {
+            $modifiedColumns[':p' . $index++]  = '`version_comment`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `summary` (%s) VALUES (%s)',
+            'INSERT INTO `content_area_version` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -733,14 +903,26 @@ abstract class Summary implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '`content`':                        
+                        $stmt->bindValue($identifier, $this->content, PDO::PARAM_STR);
+                        break;
+                    case '`active_version`':                        
+                        $stmt->bindValue($identifier, $this->active_version, PDO::PARAM_INT);
+                        break;
                     case '`id`':                        
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`topic_id`':                        
-                        $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
+                    case '`version`':                        
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
-                    case '`introduced_at`':                        
-                        $stmt->bindValue($identifier, $this->introduced_at, PDO::PARAM_INT);
+                    case '`version_created_at`':                        
+                        $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case '`version_created_by`':                        
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
+                        break;
+                    case '`version_comment`':                        
+                        $stmt->bindValue($identifier, $this->version_comment, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -749,13 +931,6 @@ abstract class Summary implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -788,7 +963,7 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = SummaryTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ContentAreaVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -805,13 +980,25 @@ abstract class Summary implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
+                return $this->getContent();
                 break;
             case 1:
-                return $this->getTopicId();
+                return $this->getactiveVersion();
                 break;
             case 2:
-                return $this->getIntroducedAt();
+                return $this->getId();
+                break;
+            case 3:
+                return $this->getVersion();
+                break;
+            case 4:
+                return $this->getVersionCreatedAt();
+                break;
+            case 5:
+                return $this->getVersionCreatedBy();
+                break;
+            case 6:
+                return $this->getVersionComment();
                 break;
             default:
                 return null;
@@ -837,61 +1024,35 @@ abstract class Summary implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['Summary'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['ContentAreaVersion'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Summary'][$this->hashCode()] = true;
-        $keys = SummaryTableMap::getFieldNames($keyType);
-        $keys_content_area = \SpoilerWiki\Map\ContentAreaTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ContentAreaVersion'][$this->hashCode()] = true;
+        $keys = ContentAreaVersionTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getTopicId(),
-            $keys[2] => $this->getIntroducedAt(),
-            $keys_content_area[0] => $this->getContent(),
-            $keys_content_area[1] => $this->getactiveVersion(),
-            $keys_content_area[3] => $this->getVersion(),
-            $keys_content_area[4] => $this->getVersionCreatedAt(),
-            $keys_content_area[5] => $this->getVersionCreatedBy(),
-            $keys_content_area[6] => $this->getVersionComment(),
-
+            $keys[0] => $this->getContent(),
+            $keys[1] => $this->getactiveVersion(),
+            $keys[2] => $this->getId(),
+            $keys[3] => $this->getVersion(),
+            $keys[4] => $this->getVersionCreatedAt(),
+            $keys[5] => $this->getVersionCreatedBy(),
+            $keys[6] => $this->getVersionComment(),
         );
+
+        $utc = new \DateTimeZone('utc');
+        if ($result[$keys[4]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[4]];
+            $result[$keys[4]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        }
+        
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
         
         if ($includeForeignObjects) {
-            if (null !== $this->atopic) {
-                
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'topic';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'topic';
-                        break;
-                    default:
-                        $key = 'Topic';
-                }
-        
-                $result[$key] = $this->atopic->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aupdatedAt) {
-                
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'milestone';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'milestone';
-                        break;
-                    default:
-                        $key = 'Milestone';
-                }
-        
-                $result[$key] = $this->aupdatedAt->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->singleContentArea) {
+            if (null !== $this->aContentArea) {
                 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
@@ -904,7 +1065,7 @@ abstract class Summary implements ActiveRecordInterface
                         $key = 'ContentArea';
                 }
         
-                $result[$key] = $this->singleContentArea->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+                $result[$key] = $this->aContentArea->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -920,11 +1081,11 @@ abstract class Summary implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\SpoilerWiki\Summary
+     * @return $this|\SpoilerWiki\ContentAreaVersion
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = SummaryTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ContentAreaVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -935,19 +1096,31 @@ abstract class Summary implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\SpoilerWiki\Summary
+     * @return $this|\SpoilerWiki\ContentAreaVersion
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
+                $this->setContent($value);
                 break;
             case 1:
-                $this->setTopicId($value);
+                $this->setactiveVersion($value);
                 break;
             case 2:
-                $this->setIntroducedAt($value);
+                $this->setId($value);
+                break;
+            case 3:
+                $this->setVersion($value);
+                break;
+            case 4:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 5:
+                $this->setVersionCreatedBy($value);
+                break;
+            case 6:
+                $this->setVersionComment($value);
                 break;
         } // switch()
 
@@ -973,16 +1146,28 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = SummaryTableMap::getFieldNames($keyType);
+        $keys = ContentAreaVersionTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
+            $this->setContent($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setTopicId($arr[$keys[1]]);
+            $this->setactiveVersion($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setIntroducedAt($arr[$keys[2]]);
+            $this->setId($arr[$keys[2]]);
+        }
+        if (array_key_exists($keys[3], $arr)) {
+            $this->setVersion($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setVersionCreatedAt($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setVersionCreatedBy($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setVersionComment($arr[$keys[6]]);
         }
     }
 
@@ -1003,7 +1188,7 @@ abstract class Summary implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\SpoilerWiki\Summary The current object, for fluid interface
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1023,16 +1208,28 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(SummaryTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ContentAreaVersionTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(SummaryTableMap::COL_ID)) {
-            $criteria->add(SummaryTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_CONTENT)) {
+            $criteria->add(ContentAreaVersionTableMap::COL_CONTENT, $this->content);
         }
-        if ($this->isColumnModified(SummaryTableMap::COL_TOPIC_ID)) {
-            $criteria->add(SummaryTableMap::COL_TOPIC_ID, $this->topic_id);
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_ACTIVE_VERSION)) {
+            $criteria->add(ContentAreaVersionTableMap::COL_ACTIVE_VERSION, $this->active_version);
         }
-        if ($this->isColumnModified(SummaryTableMap::COL_INTRODUCED_AT)) {
-            $criteria->add(SummaryTableMap::COL_INTRODUCED_AT, $this->introduced_at);
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_ID)) {
+            $criteria->add(ContentAreaVersionTableMap::COL_ID, $this->id);
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION)) {
+            $criteria->add(ContentAreaVersionTableMap::COL_VERSION, $this->version);
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION_CREATED_AT)) {
+            $criteria->add(ContentAreaVersionTableMap::COL_VERSION_CREATED_AT, $this->version_created_at);
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION_CREATED_BY)) {
+            $criteria->add(ContentAreaVersionTableMap::COL_VERSION_CREATED_BY, $this->version_created_by);
+        }
+        if ($this->isColumnModified(ContentAreaVersionTableMap::COL_VERSION_COMMENT)) {
+            $criteria->add(ContentAreaVersionTableMap::COL_VERSION_COMMENT, $this->version_comment);
         }
 
         return $criteria;
@@ -1050,8 +1247,9 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildSummaryQuery::create();
-        $criteria->add(SummaryTableMap::COL_ID, $this->id);
+        $criteria = ChildContentAreaVersionQuery::create();
+        $criteria->add(ContentAreaVersionTableMap::COL_ID, $this->id);
+        $criteria->add(ContentAreaVersionTableMap::COL_VERSION, $this->version);
 
         return $criteria;
     }
@@ -1064,10 +1262,18 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getId();
+        $validPk = null !== $this->getId() &&
+            null !== $this->getVersion();
 
-        $validPrimaryKeyFKs = 0;
+        $validPrimaryKeyFKs = 1;
         $primaryKeyFKs = [];
+
+        //relation content_area_version_fk_560284 to table content_area
+        if ($this->aContentArea && $hash = spl_object_hash($this->aContentArea)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -1079,23 +1285,29 @@ abstract class Summary implements ActiveRecordInterface
     }
         
     /**
-     * Returns the primary key for this object (row).
-     * @return int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getVersion();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setId($keys[0]);
+        $this->setVersion($keys[1]);
     }
 
     /**
@@ -1104,7 +1316,7 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return null === $this->getId();
+        return (null === $this->getId()) && (null === $this->getVersion());
     }
 
     /**
@@ -1113,31 +1325,22 @@ abstract class Summary implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \SpoilerWiki\Summary (or compatible) type.
+     * @param      object $copyObj An object of \SpoilerWiki\ContentAreaVersion (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setTopicId($this->getTopicId());
-        $copyObj->setIntroducedAt($this->getIntroducedAt());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            $relObj = $this->getContentArea();
-            if ($relObj) {
-                $copyObj->setContentArea($relObj->copy($deepCopy));
-            }
-
-        } // if ($deepCopy)
-
+        $copyObj->setContent($this->getContent());
+        $copyObj->setactiveVersion($this->getactiveVersion());
+        $copyObj->setId($this->getId());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
+        $copyObj->setVersionComment($this->getVersionComment());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1150,7 +1353,7 @@ abstract class Summary implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \SpoilerWiki\Summary Clone of current object.
+     * @return \SpoilerWiki\ContentAreaVersion Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1164,154 +1367,54 @@ abstract class Summary implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildTopic object.
+     * Declares an association between this object and a ChildContentArea object.
      *
-     * @param  ChildTopic $v
-     * @return $this|\SpoilerWiki\Summary The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function settopic(ChildTopic $v = null)
-    {
-        if ($v === null) {
-            $this->setTopicId(NULL);
-        } else {
-            $this->setTopicId($v->getId());
-        }
-
-        $this->atopic = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildTopic object, it will not be re-added.
-        if ($v !== null) {
-            $v->addSummary($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildTopic object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTopic The associated ChildTopic object.
-     * @throws PropelException
-     */
-    public function gettopic(ConnectionInterface $con = null)
-    {
-        if ($this->atopic === null && ($this->topic_id !== null)) {
-            $this->atopic = ChildTopicQuery::create()->findPk($this->topic_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->atopic->addSummaries($this);
-             */
-        }
-
-        return $this->atopic;
-    }
-
-    /**
-     * Declares an association between this object and a ChildMilestone object.
-     *
-     * @param  ChildMilestone $v
-     * @return $this|\SpoilerWiki\Summary The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setupdatedAt(ChildMilestone $v = null)
-    {
-        if ($v === null) {
-            $this->setIntroducedAt(NULL);
-        } else {
-            $this->setIntroducedAt($v->getId());
-        }
-
-        $this->aupdatedAt = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildMilestone object, it will not be re-added.
-        if ($v !== null) {
-            $v->addSummary($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildMilestone object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildMilestone The associated ChildMilestone object.
-     * @throws PropelException
-     */
-    public function getupdatedAt(ConnectionInterface $con = null)
-    {
-        if ($this->aupdatedAt === null && ($this->introduced_at !== null)) {
-            $this->aupdatedAt = ChildMilestoneQuery::create()->findPk($this->introduced_at, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aupdatedAt->addSummaries($this);
-             */
-        }
-
-        return $this->aupdatedAt;
-    }
-
-
-    /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
-     *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single ChildContentArea object, which is related to this object by a one-to-one relationship.
-     *
-     * @param  ConnectionInterface $con optional connection object
-     * @return ChildContentArea
-     * @throws PropelException
-     */
-    public function getContentArea(ConnectionInterface $con = null)
-    {
-
-        if ($this->singleContentArea === null && !$this->isNew()) {
-            $this->singleContentArea = ChildContentAreaQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleContentArea;
-    }
-
-    /**
-     * Sets a single ChildContentArea object as related to this object by a one-to-one relationship.
-     *
-     * @param  ChildContentArea $v ChildContentArea
-     * @return $this|\SpoilerWiki\Summary The current object (for fluent API support)
+     * @param  ChildContentArea $v
+     * @return $this|\SpoilerWiki\ContentAreaVersion The current object (for fluent API support)
      * @throws PropelException
      */
     public function setContentArea(ChildContentArea $v = null)
     {
-        $this->singleContentArea = $v;
-
-        // Make sure that that the passed-in ChildContentArea isn't already associated with this object
-        if ($v !== null && $v->getSummary(null, false) === null) {
-            $v->setSummary($this);
+        if ($v === null) {
+            $this->setId(NULL);
+        } else {
+            $this->setId($v->getId());
         }
 
+        $this->aContentArea = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildContentArea object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContentAreaVersion($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated ChildContentArea object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildContentArea The associated ChildContentArea object.
+     * @throws PropelException
+     */
+    public function getContentArea(ConnectionInterface $con = null)
+    {
+        if ($this->aContentArea === null && ($this->id !== null)) {
+            $this->aContentArea = ChildContentAreaQuery::create()->findPk($this->id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aContentArea->addContentAreaVersions($this);
+             */
+        }
+
+        return $this->aContentArea;
     }
 
     /**
@@ -1321,17 +1424,19 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->atopic) {
-            $this->atopic->removeSummary($this);
+        if (null !== $this->aContentArea) {
+            $this->aContentArea->removeContentAreaVersion($this);
         }
-        if (null !== $this->aupdatedAt) {
-            $this->aupdatedAt->removeSummary($this);
-        }
+        $this->content = null;
+        $this->active_version = null;
         $this->id = null;
-        $this->topic_id = null;
-        $this->introduced_at = null;
+        $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
+        $this->version_comment = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1348,14 +1453,9 @@ abstract class Summary implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleContentArea) {
-                $this->singleContentArea->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        $this->singleContentArea = null;
-        $this->atopic = null;
-        $this->aupdatedAt = null;
+        $this->aContentArea = null;
     }
 
     /**
@@ -1365,7 +1465,7 @@ abstract class Summary implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(SummaryTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ContentAreaVersionTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**
@@ -1446,33 +1546,6 @@ abstract class Summary implements ActiveRecordInterface
 
 
     /**
-     * Catches calls to undefined methods.
-     *
-     * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
-     * Allows to define default __call() behavior if you overwrite __call()
-     *
-     * @param string $name
-     * @param mixed  $params
-     *
-     * @return array|string
-     */
-    public function __call($name, $params)
-    {
-        
-    // delegate behavior
-    
-    if (is_callable(array('\SpoilerWiki\ContentArea', $name))) {
-        if (!$delegate = $this->getContentArea()) {
-            $delegate = new ChildContentArea();
-            $this->setContentArea($delegate);
-        }
-    
-        return call_user_func_array(array($delegate, $name), $params);
-    }
-        return $this->__parentCall($name, $params);
-    }
-
-    /**
      * Derived method to catches calls to undefined methods.
      *
      * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
@@ -1483,7 +1556,7 @@ abstract class Summary implements ActiveRecordInterface
      *
      * @return array|string
      */
-    public function __parentCall($name, $params)
+    public function __call($name, $params)
     {
         if (0 === strpos($name, 'get')) {
             $virtualColumn = substr($name, 3);

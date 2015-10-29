@@ -15,6 +15,8 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use SpoilerWiki\ContentArea as ChildContentArea;
+use SpoilerWiki\ContentAreaQuery as ChildContentAreaQuery;
 use SpoilerWiki\Milestone as ChildMilestone;
 use SpoilerWiki\MilestoneQuery as ChildMilestoneQuery;
 use SpoilerWiki\SnippetQuery as ChildSnippetQuery;
@@ -71,13 +73,6 @@ abstract class Snippet implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the content field.
-     * 
-     * @var        string
-     */
-    protected $content;
-
-    /**
      * The value for the topic_id field.
      * 
      * @var        int
@@ -100,6 +95,11 @@ abstract class Snippet implements ActiveRecordInterface
      * @var        ChildMilestone
      */
     protected $aintroducedAt;
+
+    /**
+     * @var        ChildContentArea one-to-one related ChildContentArea object
+     */
+    protected $singleContentArea;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -342,16 +342,6 @@ abstract class Snippet implements ActiveRecordInterface
     }
 
     /**
-     * Get the [content] column value.
-     * 
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    /**
      * Get the [topic_id] column value.
      * 
      * @return int
@@ -390,26 +380,6 @@ abstract class Snippet implements ActiveRecordInterface
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [content] column.
-     * 
-     * @param string $v new value
-     * @return $this|\SpoilerWiki\Snippet The current object (for fluent API support)
-     */
-    public function setContent($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->content !== $v) {
-            $this->content = $v;
-            $this->modifiedColumns[SnippetTableMap::COL_CONTENT] = true;
-        }
-
-        return $this;
-    } // setContent()
 
     /**
      * Set the value of [topic_id] column.
@@ -498,13 +468,10 @@ abstract class Snippet implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SnippetTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SnippetTableMap::translateFieldName('Content', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->content = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SnippetTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SnippetTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->topic_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : SnippetTableMap::translateFieldName('IntroducedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SnippetTableMap::translateFieldName('IntroducedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->introduced_at = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -514,7 +481,7 @@ abstract class Snippet implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = SnippetTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = SnippetTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\SpoilerWiki\\Snippet'), 0, $e);
@@ -583,6 +550,8 @@ abstract class Snippet implements ActiveRecordInterface
 
             $this->atopic = null;
             $this->aintroducedAt = null;
+            $this->singleContentArea = null;
+
         } // if (deep)
     }
 
@@ -712,6 +681,12 @@ abstract class Snippet implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->singleContentArea !== null) {
+                if (!$this->singleContentArea->isDeleted() && ($this->singleContentArea->isNew() || $this->singleContentArea->isModified())) {
+                    $affectedRows += $this->singleContentArea->save($con);
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -741,9 +716,6 @@ abstract class Snippet implements ActiveRecordInterface
         if ($this->isColumnModified(SnippetTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(SnippetTableMap::COL_CONTENT)) {
-            $modifiedColumns[':p' . $index++]  = '`content`';
-        }
         if ($this->isColumnModified(SnippetTableMap::COL_TOPIC_ID)) {
             $modifiedColumns[':p' . $index++]  = '`topic_id`';
         }
@@ -763,9 +735,6 @@ abstract class Snippet implements ActiveRecordInterface
                 switch ($columnName) {
                     case '`id`':                        
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case '`content`':                        
-                        $stmt->bindValue($identifier, $this->content, PDO::PARAM_STR);
                         break;
                     case '`topic_id`':                        
                         $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
@@ -839,12 +808,9 @@ abstract class Snippet implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getContent();
-                break;
-            case 2:
                 return $this->getTopicId();
                 break;
-            case 3:
+            case 2:
                 return $this->getIntroducedAt();
                 break;
             default:
@@ -876,11 +842,18 @@ abstract class Snippet implements ActiveRecordInterface
         }
         $alreadyDumpedObjects['Snippet'][$this->hashCode()] = true;
         $keys = SnippetTableMap::getFieldNames($keyType);
+        $keys_content_area = \SpoilerWiki\Map\ContentAreaTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getContent(),
-            $keys[2] => $this->getTopicId(),
-            $keys[3] => $this->getIntroducedAt(),
+            $keys[1] => $this->getTopicId(),
+            $keys[2] => $this->getIntroducedAt(),
+            $keys_content_area[0] => $this->getContent(),
+            $keys_content_area[1] => $this->getactiveVersion(),
+            $keys_content_area[3] => $this->getVersion(),
+            $keys_content_area[4] => $this->getVersionCreatedAt(),
+            $keys_content_area[5] => $this->getVersionCreatedBy(),
+            $keys_content_area[6] => $this->getVersionComment(),
+
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -917,6 +890,21 @@ abstract class Snippet implements ActiveRecordInterface
                 }
         
                 $result[$key] = $this->aintroducedAt->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->singleContentArea) {
+                
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'contentArea';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'content_area';
+                        break;
+                    default:
+                        $key = 'ContentArea';
+                }
+        
+                $result[$key] = $this->singleContentArea->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
         }
 
@@ -956,12 +944,9 @@ abstract class Snippet implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setContent($value);
-                break;
-            case 2:
                 $this->setTopicId($value);
                 break;
-            case 3:
+            case 2:
                 $this->setIntroducedAt($value);
                 break;
         } // switch()
@@ -994,13 +979,10 @@ abstract class Snippet implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setContent($arr[$keys[1]]);
+            $this->setTopicId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setTopicId($arr[$keys[2]]);
-        }
-        if (array_key_exists($keys[3], $arr)) {
-            $this->setIntroducedAt($arr[$keys[3]]);
+            $this->setIntroducedAt($arr[$keys[2]]);
         }
     }
 
@@ -1045,9 +1027,6 @@ abstract class Snippet implements ActiveRecordInterface
 
         if ($this->isColumnModified(SnippetTableMap::COL_ID)) {
             $criteria->add(SnippetTableMap::COL_ID, $this->id);
-        }
-        if ($this->isColumnModified(SnippetTableMap::COL_CONTENT)) {
-            $criteria->add(SnippetTableMap::COL_CONTENT, $this->content);
         }
         if ($this->isColumnModified(SnippetTableMap::COL_TOPIC_ID)) {
             $criteria->add(SnippetTableMap::COL_TOPIC_ID, $this->topic_id);
@@ -1141,9 +1120,21 @@ abstract class Snippet implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setContent($this->getContent());
         $copyObj->setTopicId($this->getTopicId());
         $copyObj->setIntroducedAt($this->getIntroducedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            $relObj = $this->getContentArea();
+            if ($relObj) {
+                $copyObj->setContentArea($relObj->copy($deepCopy));
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1274,6 +1265,55 @@ abstract class Snippet implements ActiveRecordInterface
         return $this->aintroducedAt;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+    }
+
+    /**
+     * Gets a single ChildContentArea object, which is related to this object by a one-to-one relationship.
+     *
+     * @param  ConnectionInterface $con optional connection object
+     * @return ChildContentArea
+     * @throws PropelException
+     */
+    public function getContentArea(ConnectionInterface $con = null)
+    {
+
+        if ($this->singleContentArea === null && !$this->isNew()) {
+            $this->singleContentArea = ChildContentAreaQuery::create()->findPk($this->getPrimaryKey(), $con);
+        }
+
+        return $this->singleContentArea;
+    }
+
+    /**
+     * Sets a single ChildContentArea object as related to this object by a one-to-one relationship.
+     *
+     * @param  ChildContentArea $v ChildContentArea
+     * @return $this|\SpoilerWiki\Snippet The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setContentArea(ChildContentArea $v = null)
+    {
+        $this->singleContentArea = $v;
+
+        // Make sure that that the passed-in ChildContentArea isn't already associated with this object
+        if ($v !== null && $v->getSnippet(null, false) === null) {
+            $v->setSnippet($this);
+        }
+
+        return $this;
+    }
+
     /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
@@ -1288,7 +1328,6 @@ abstract class Snippet implements ActiveRecordInterface
             $this->aintroducedAt->removeSnippet($this);
         }
         $this->id = null;
-        $this->content = null;
         $this->topic_id = null;
         $this->introduced_at = null;
         $this->alreadyInSave = false;
@@ -1309,8 +1348,12 @@ abstract class Snippet implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->singleContentArea) {
+                $this->singleContentArea->clearAllReferences($deep);
+            }
         } // if ($deep)
 
+        $this->singleContentArea = null;
         $this->atopic = null;
         $this->aintroducedAt = null;
     }
@@ -1403,7 +1446,7 @@ abstract class Snippet implements ActiveRecordInterface
 
 
     /**
-     * Derived method to catches calls to undefined methods.
+     * Catches calls to undefined methods.
      *
      * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
      * Allows to define default __call() behavior if you overwrite __call()
@@ -1414,6 +1457,33 @@ abstract class Snippet implements ActiveRecordInterface
      * @return array|string
      */
     public function __call($name, $params)
+    {
+        
+    // delegate behavior
+    
+    if (is_callable(array('\SpoilerWiki\ContentArea', $name))) {
+        if (!$delegate = $this->getContentArea()) {
+            $delegate = new ChildContentArea();
+            $this->setContentArea($delegate);
+        }
+    
+        return call_user_func_array(array($delegate, $name), $params);
+    }
+        return $this->__parentCall($name, $params);
+    }
+
+    /**
+     * Derived method to catches calls to undefined methods.
+     *
+     * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
+     * Allows to define default __call() behavior if you overwrite __call()
+     *
+     * @param string $name
+     * @param mixed  $params
+     *
+     * @return array|string
+     */
+    public function __parentCall($name, $params)
     {
         if (0 === strpos($name, 'get')) {
             $virtualColumn = substr($name, 3);

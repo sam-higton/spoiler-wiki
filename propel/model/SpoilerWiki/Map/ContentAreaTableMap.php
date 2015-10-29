@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use SpoilerWiki\Summary;
-use SpoilerWiki\SummaryQuery;
+use SpoilerWiki\ContentArea;
+use SpoilerWiki\ContentAreaQuery;
 
 
 /**
- * This class defines the structure of the 'summary' table.
+ * This class defines the structure of the 'content_area' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use SpoilerWiki\SummaryQuery;
  * (i.e. if it's a text column type).
  *
  */
-class SummaryTableMap extends TableMap
+class ContentAreaTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class SummaryTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'SpoilerWiki.Map.SummaryTableMap';
+    const CLASS_NAME = 'SpoilerWiki.Map.ContentAreaTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class SummaryTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'summary';
+    const TABLE_NAME = 'content_area';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\SpoilerWiki\\Summary';
+    const OM_CLASS = '\\SpoilerWiki\\ContentArea';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'SpoilerWiki.Summary';
+    const CLASS_DEFAULT = 'SpoilerWiki.ContentArea';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -69,22 +69,42 @@ class SummaryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 7;
+
+    /**
+     * the column name for the content field
+     */
+    const COL_CONTENT = 'content_area.content';
+
+    /**
+     * the column name for the active_version field
+     */
+    const COL_ACTIVE_VERSION = 'content_area.active_version';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'summary.id';
+    const COL_ID = 'content_area.id';
 
     /**
-     * the column name for the topic_id field
+     * the column name for the version field
      */
-    const COL_TOPIC_ID = 'summary.topic_id';
+    const COL_VERSION = 'content_area.version';
 
     /**
-     * the column name for the introduced_at field
+     * the column name for the version_created_at field
      */
-    const COL_INTRODUCED_AT = 'summary.introduced_at';
+    const COL_VERSION_CREATED_AT = 'content_area.version_created_at';
+
+    /**
+     * the column name for the version_created_by field
+     */
+    const COL_VERSION_CREATED_BY = 'content_area.version_created_by';
+
+    /**
+     * the column name for the version_comment field
+     */
+    const COL_VERSION_COMMENT = 'content_area.version_comment';
 
     /**
      * The default string format for model objects of the related table
@@ -98,11 +118,11 @@ class SummaryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'TopicId', 'IntroducedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'topicId', 'introducedAt', ),
-        self::TYPE_COLNAME       => array(SummaryTableMap::COL_ID, SummaryTableMap::COL_TOPIC_ID, SummaryTableMap::COL_INTRODUCED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'topic_id', 'introduced_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Content', 'activeVersion', 'Id', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', 'VersionComment', ),
+        self::TYPE_CAMELNAME     => array('content', 'activeVersion', 'id', 'version', 'versionCreatedAt', 'versionCreatedBy', 'versionComment', ),
+        self::TYPE_COLNAME       => array(ContentAreaTableMap::COL_CONTENT, ContentAreaTableMap::COL_ACTIVE_VERSION, ContentAreaTableMap::COL_ID, ContentAreaTableMap::COL_VERSION, ContentAreaTableMap::COL_VERSION_CREATED_AT, ContentAreaTableMap::COL_VERSION_CREATED_BY, ContentAreaTableMap::COL_VERSION_COMMENT, ),
+        self::TYPE_FIELDNAME     => array('content', 'active_version', 'id', 'version', 'version_created_at', 'version_created_by', 'version_comment', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -112,11 +132,11 @@ class SummaryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'TopicId' => 1, 'IntroducedAt' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'topicId' => 1, 'introducedAt' => 2, ),
-        self::TYPE_COLNAME       => array(SummaryTableMap::COL_ID => 0, SummaryTableMap::COL_TOPIC_ID => 1, SummaryTableMap::COL_INTRODUCED_AT => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'topic_id' => 1, 'introduced_at' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Content' => 0, 'activeVersion' => 1, 'Id' => 2, 'Version' => 3, 'VersionCreatedAt' => 4, 'VersionCreatedBy' => 5, 'VersionComment' => 6, ),
+        self::TYPE_CAMELNAME     => array('content' => 0, 'activeVersion' => 1, 'id' => 2, 'version' => 3, 'versionCreatedAt' => 4, 'versionCreatedBy' => 5, 'versionComment' => 6, ),
+        self::TYPE_COLNAME       => array(ContentAreaTableMap::COL_CONTENT => 0, ContentAreaTableMap::COL_ACTIVE_VERSION => 1, ContentAreaTableMap::COL_ID => 2, ContentAreaTableMap::COL_VERSION => 3, ContentAreaTableMap::COL_VERSION_CREATED_AT => 4, ContentAreaTableMap::COL_VERSION_CREATED_BY => 5, ContentAreaTableMap::COL_VERSION_COMMENT => 6, ),
+        self::TYPE_FIELDNAME     => array('content' => 0, 'active_version' => 1, 'id' => 2, 'version' => 3, 'version_created_at' => 4, 'version_created_by' => 5, 'version_comment' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -129,16 +149,21 @@ class SummaryTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('summary');
-        $this->setPhpName('Summary');
+        $this->setName('content_area');
+        $this->setPhpName('ContentArea');
         $this->setIdentifierQuoting(true);
-        $this->setClassName('\\SpoilerWiki\\Summary');
+        $this->setClassName('\\SpoilerWiki\\ContentArea');
         $this->setPackage('SpoilerWiki');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('topic_id', 'TopicId', 'INTEGER', 'topic', 'id', true, null, null);
-        $this->addForeignKey('introduced_at', 'IntroducedAt', 'INTEGER', 'milestone', 'id', true, null, null);
+        $this->addColumn('content', 'Content', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('active_version', 'activeVersion', 'INTEGER', false, null, 1);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'snippet', 'id', true, null, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'summary', 'id', true, null, null);
+        $this->addColumn('version', 'Version', 'INTEGER', false, null, 0);
+        $this->addColumn('version_created_at', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version_created_by', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
+        $this->addColumn('version_comment', 'VersionComment', 'VARCHAR', false, 255, null);
     } // initialize()
 
     /**
@@ -146,27 +171,27 @@ class SummaryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('topic', '\\SpoilerWiki\\Topic', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':topic_id',
-    1 => ':id',
-  ),
-), null, null, null, false);
-        $this->addRelation('updatedAt', '\\SpoilerWiki\\Milestone', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':introduced_at',
-    1 => ':id',
-  ),
-), null, null, null, false);
-        $this->addRelation('ContentArea', '\\SpoilerWiki\\ContentArea', RelationMap::ONE_TO_ONE, array (
+        $this->addRelation('Snippet', '\\SpoilerWiki\\Snippet', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':id',
     1 => ':id',
   ),
 ), 'CASCADE', null, null, false);
+        $this->addRelation('Summary', '\\SpoilerWiki\\Summary', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
+        $this->addRelation('ContentAreaVersion', '\\SpoilerWiki\\ContentAreaVersion', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, 'ContentAreaVersions', false);
     } // buildRelations()
 
     /**
@@ -178,17 +203,17 @@ class SummaryTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'delegate' => array('to' => 'content_area', ),
+            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'true', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', 'indices' => 'false', ),
         );
     } // getBehaviors()
     /**
-     * Method to invalidate the instance pool of all tables related to summary     * by a foreign key with ON DELETE CASCADE
+     * Method to invalidate the instance pool of all tables related to content_area     * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
     {
         // Invalidate objects in related instance pools,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ContentAreaTableMap::clearInstancePool();
+        ContentAreaVersionTableMap::clearInstancePool();
     }
 
     /**
@@ -207,11 +232,11 @@ class SummaryTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -230,7 +255,7 @@ class SummaryTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
+                ? 2 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -248,7 +273,7 @@ class SummaryTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? SummaryTableMap::CLASS_DEFAULT : SummaryTableMap::OM_CLASS;
+        return $withPrefix ? ContentAreaTableMap::CLASS_DEFAULT : ContentAreaTableMap::OM_CLASS;
     }
 
     /**
@@ -262,22 +287,22 @@ class SummaryTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Summary object, last column rank)
+     * @return array           (ContentArea object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = SummaryTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = SummaryTableMap::getInstanceFromPool($key))) {
+        $key = ContentAreaTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ContentAreaTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + SummaryTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ContentAreaTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = SummaryTableMap::OM_CLASS;
-            /** @var Summary $obj */
+            $cls = ContentAreaTableMap::OM_CLASS;
+            /** @var ContentArea $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            SummaryTableMap::addInstanceToPool($obj, $key);
+            ContentAreaTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -300,18 +325,18 @@ class SummaryTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = SummaryTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = SummaryTableMap::getInstanceFromPool($key))) {
+            $key = ContentAreaTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ContentAreaTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Summary $obj */
+                /** @var ContentArea $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                SummaryTableMap::addInstanceToPool($obj, $key);
+                ContentAreaTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -332,13 +357,21 @@ class SummaryTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(SummaryTableMap::COL_ID);
-            $criteria->addSelectColumn(SummaryTableMap::COL_TOPIC_ID);
-            $criteria->addSelectColumn(SummaryTableMap::COL_INTRODUCED_AT);
+            $criteria->addSelectColumn(ContentAreaTableMap::COL_CONTENT);
+            $criteria->addSelectColumn(ContentAreaTableMap::COL_ACTIVE_VERSION);
+            $criteria->addSelectColumn(ContentAreaTableMap::COL_ID);
+            $criteria->addSelectColumn(ContentAreaTableMap::COL_VERSION);
+            $criteria->addSelectColumn(ContentAreaTableMap::COL_VERSION_CREATED_AT);
+            $criteria->addSelectColumn(ContentAreaTableMap::COL_VERSION_CREATED_BY);
+            $criteria->addSelectColumn(ContentAreaTableMap::COL_VERSION_COMMENT);
         } else {
+            $criteria->addSelectColumn($alias . '.content');
+            $criteria->addSelectColumn($alias . '.active_version');
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.topic_id');
-            $criteria->addSelectColumn($alias . '.introduced_at');
+            $criteria->addSelectColumn($alias . '.version');
+            $criteria->addSelectColumn($alias . '.version_created_at');
+            $criteria->addSelectColumn($alias . '.version_created_by');
+            $criteria->addSelectColumn($alias . '.version_comment');
         }
     }
 
@@ -351,7 +384,7 @@ class SummaryTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(SummaryTableMap::DATABASE_NAME)->getTable(SummaryTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ContentAreaTableMap::DATABASE_NAME)->getTable(ContentAreaTableMap::TABLE_NAME);
     }
 
     /**
@@ -359,16 +392,16 @@ class SummaryTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(SummaryTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(SummaryTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new SummaryTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ContentAreaTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(ContentAreaTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new ContentAreaTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Summary or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ContentArea or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Summary object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ContentArea object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -379,27 +412,27 @@ class SummaryTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(SummaryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ContentAreaTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \SpoilerWiki\Summary) { // it's a model object
+        } elseif ($values instanceof \SpoilerWiki\ContentArea) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(SummaryTableMap::DATABASE_NAME);
-            $criteria->add(SummaryTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ContentAreaTableMap::DATABASE_NAME);
+            $criteria->add(ContentAreaTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = SummaryQuery::create()->mergeWith($criteria);
+        $query = ContentAreaQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            SummaryTableMap::clearInstancePool();
+            ContentAreaTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                SummaryTableMap::removeInstanceFromPool($singleval);
+                ContentAreaTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -407,20 +440,20 @@ class SummaryTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the summary table.
+     * Deletes all rows from the content_area table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return SummaryQuery::create()->doDeleteAll($con);
+        return ContentAreaQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Summary or Criteria object.
+     * Performs an INSERT on the database, given a ContentArea or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Summary object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ContentArea object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -429,22 +462,18 @@ class SummaryTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(SummaryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ContentAreaTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Summary object
-        }
-
-        if ($criteria->containsKey(SummaryTableMap::COL_ID) && $criteria->keyContainsValue(SummaryTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.SummaryTableMap::COL_ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from ContentArea object
         }
 
 
         // Set the correct dbName
-        $query = SummaryQuery::create()->mergeWith($criteria);
+        $query = ContentAreaQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -453,7 +482,7 @@ class SummaryTableMap extends TableMap
         });
     }
 
-} // SummaryTableMap
+} // ContentAreaTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-SummaryTableMap::buildTableMap();
+ContentAreaTableMap::buildTableMap();

@@ -132,7 +132,6 @@ DROP TABLE IF EXISTS `snippet`;
 CREATE TABLE `snippet`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `content` TEXT,
     `topic_id` INTEGER NOT NULL,
     `introduced_at` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
@@ -155,7 +154,6 @@ DROP TABLE IF EXISTS `summary`;
 CREATE TABLE `summary`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `content` TEXT NOT NULL,
     `topic_id` INTEGER NOT NULL,
     `introduced_at` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
@@ -167,6 +165,32 @@ CREATE TABLE `summary`
     CONSTRAINT `summary_fk_75f046`
         FOREIGN KEY (`introduced_at`)
         REFERENCES `milestone` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- content_area
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `content_area`;
+
+CREATE TABLE `content_area`
+(
+    `content` TEXT NOT NULL,
+    `active_version` INTEGER DEFAULT 1,
+    `id` INTEGER NOT NULL,
+    `version` INTEGER DEFAULT 0,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
+    `version_comment` VARCHAR(255),
+    PRIMARY KEY (`id`),
+    CONSTRAINT `content_area_fk_6eb46d`
+        FOREIGN KEY (`id`)
+        REFERENCES `snippet` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `content_area_fk_c186ba`
+        FOREIGN KEY (`id`)
+        REFERENCES `summary` (`id`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -246,6 +270,28 @@ CREATE TABLE `assigned_role`
     CONSTRAINT `assigned_role_fk_213711`
         FOREIGN KEY (`user_id`)
         REFERENCES `role` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- content_area_version
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `content_area_version`;
+
+CREATE TABLE `content_area_version`
+(
+    `content` TEXT NOT NULL,
+    `active_version` INTEGER DEFAULT 1,
+    `id` INTEGER NOT NULL,
+    `version` INTEGER DEFAULT 0 NOT NULL,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
+    `version_comment` VARCHAR(255),
+    PRIMARY KEY (`id`,`version`),
+    CONSTRAINT `content_area_version_fk_560284`
+        FOREIGN KEY (`id`)
+        REFERENCES `content_area` (`id`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
