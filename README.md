@@ -1,5 +1,7 @@
 # spoiler-wiki
-a wiki that hides spoilers
+Need to look up a character in a book you're reading, but worried about finding spoilers in the process? We've got you covered.
+
+Tell us how far you've read before searching this wiki, and it will only return information discovered up to the point you've reached.
 
 built with [Propel ORM](http://propelorm.org/) and [Slim](http://www.slimframework.com/). Developed using [Vagrant](http://vagrantup.com) with [Scotch Box](https://box.scotch.io/).
 
