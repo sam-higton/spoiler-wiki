@@ -23,16 +23,16 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWorkQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildWorkQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildWorkQuery orderByDescription($order = Criteria::ASC) Order by the description column
- * @method     ChildWorkQuery orderByOrder($order = Criteria::ASC) Order by the order column
  * @method     ChildWorkQuery orderByPrimaryArtistId($order = Criteria::ASC) Order by the primary_artist_id column
  * @method     ChildWorkQuery orderByCanonId($order = Criteria::ASC) Order by the canon_id column
+ * @method     ChildWorkQuery orderBySortableRank($order = Criteria::ASC) Order by the sortable_rank column
  *
  * @method     ChildWorkQuery groupById() Group by the id column
  * @method     ChildWorkQuery groupByName() Group by the name column
  * @method     ChildWorkQuery groupByDescription() Group by the description column
- * @method     ChildWorkQuery groupByOrder() Group by the order column
  * @method     ChildWorkQuery groupByPrimaryArtistId() Group by the primary_artist_id column
  * @method     ChildWorkQuery groupByCanonId() Group by the canon_id column
+ * @method     ChildWorkQuery groupBySortableRank() Group by the sortable_rank column
  *
  * @method     ChildWorkQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildWorkQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -80,9 +80,9 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWork findOneById(int $id) Return the first ChildWork filtered by the id column
  * @method     ChildWork findOneByName(string $name) Return the first ChildWork filtered by the name column
  * @method     ChildWork findOneByDescription(string $description) Return the first ChildWork filtered by the description column
- * @method     ChildWork findOneByOrder(int $order) Return the first ChildWork filtered by the order column
  * @method     ChildWork findOneByPrimaryArtistId(int $primary_artist_id) Return the first ChildWork filtered by the primary_artist_id column
- * @method     ChildWork findOneByCanonId(int $canon_id) Return the first ChildWork filtered by the canon_id column *
+ * @method     ChildWork findOneByCanonId(int $canon_id) Return the first ChildWork filtered by the canon_id column
+ * @method     ChildWork findOneBySortableRank(int $sortable_rank) Return the first ChildWork filtered by the sortable_rank column *
 
  * @method     ChildWork requirePk($key, ConnectionInterface $con = null) Return the ChildWork by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOne(ConnectionInterface $con = null) Return the first ChildWork matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -90,17 +90,17 @@ use SpoilerWiki\Map\WorkTableMap;
  * @method     ChildWork requireOneById(int $id) Return the first ChildWork filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOneByName(string $name) Return the first ChildWork filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOneByDescription(string $description) Return the first ChildWork filtered by the description column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildWork requireOneByOrder(int $order) Return the first ChildWork filtered by the order column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOneByPrimaryArtistId(int $primary_artist_id) Return the first ChildWork filtered by the primary_artist_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWork requireOneByCanonId(int $canon_id) Return the first ChildWork filtered by the canon_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildWork requireOneBySortableRank(int $sortable_rank) Return the first ChildWork filtered by the sortable_rank column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildWork[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildWork objects based on current ModelCriteria
  * @method     ChildWork[]|ObjectCollection findById(int $id) Return ChildWork objects filtered by the id column
  * @method     ChildWork[]|ObjectCollection findByName(string $name) Return ChildWork objects filtered by the name column
  * @method     ChildWork[]|ObjectCollection findByDescription(string $description) Return ChildWork objects filtered by the description column
- * @method     ChildWork[]|ObjectCollection findByOrder(int $order) Return ChildWork objects filtered by the order column
  * @method     ChildWork[]|ObjectCollection findByPrimaryArtistId(int $primary_artist_id) Return ChildWork objects filtered by the primary_artist_id column
  * @method     ChildWork[]|ObjectCollection findByCanonId(int $canon_id) Return ChildWork objects filtered by the canon_id column
+ * @method     ChildWork[]|ObjectCollection findBySortableRank(int $sortable_rank) Return ChildWork objects filtered by the sortable_rank column
  * @method     ChildWork[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -193,7 +193,7 @@ abstract class WorkQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT `id`, `name`, `description`, `order`, `primary_artist_id`, `canon_id` FROM `work` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `name`, `description`, `primary_artist_id`, `canon_id`, `sortable_rank` FROM `work` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -383,47 +383,6 @@ abstract class WorkQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the order column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByOrder(1234); // WHERE order = 1234
-     * $query->filterByOrder(array(12, 34)); // WHERE order IN (12, 34)
-     * $query->filterByOrder(array('min' => 12)); // WHERE order > 12
-     * </code>
-     *
-     * @param     mixed $order The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildWorkQuery The current query, for fluid interface
-     */
-    public function filterByOrder($order = null, $comparison = null)
-    {
-        if (is_array($order)) {
-            $useMinMax = false;
-            if (isset($order['min'])) {
-                $this->addUsingAlias(WorkTableMap::COL_ORDER, $order['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($order['max'])) {
-                $this->addUsingAlias(WorkTableMap::COL_ORDER, $order['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(WorkTableMap::COL_ORDER, $order, $comparison);
-    }
-
-    /**
      * Filter the query on the primary_artist_id column
      *
      * Example usage:
@@ -507,6 +466,47 @@ abstract class WorkQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(WorkTableMap::COL_CANON_ID, $canonId, $comparison);
+    }
+
+    /**
+     * Filter the query on the sortable_rank column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySortableRank(1234); // WHERE sortable_rank = 1234
+     * $query->filterBySortableRank(array(12, 34)); // WHERE sortable_rank IN (12, 34)
+     * $query->filterBySortableRank(array('min' => 12)); // WHERE sortable_rank > 12
+     * </code>
+     *
+     * @param     mixed $sortableRank The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildWorkQuery The current query, for fluid interface
+     */
+    public function filterBySortableRank($sortableRank = null, $comparison = null)
+    {
+        if (is_array($sortableRank)) {
+            $useMinMax = false;
+            if (isset($sortableRank['min'])) {
+                $this->addUsingAlias(WorkTableMap::COL_SORTABLE_RANK, $sortableRank['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($sortableRank['max'])) {
+                $this->addUsingAlias(WorkTableMap::COL_SORTABLE_RANK, $sortableRank['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(WorkTableMap::COL_SORTABLE_RANK, $sortableRank, $comparison);
     }
 
     /**
@@ -811,6 +811,226 @@ abstract class WorkQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // sortable behavior
+    
+    /**
+     * Filter the query based on a rank in the list
+     *
+     * @param     integer   $rank rank
+     *
+     * @return    ChildWorkQuery The current query, for fluid interface
+     */
+    public function filterByRank($rank)
+    {
+    
+        return $this
+            ->addUsingAlias(WorkTableMap::RANK_COL, $rank, Criteria::EQUAL);
+    }
+    
+    /**
+     * Order the query based on the rank in the list.
+     * Using the default $order, returns the item with the lowest rank first
+     *
+     * @param     string $order either Criteria::ASC (default) or Criteria::DESC
+     *
+     * @return    $this|ChildWorkQuery The current query, for fluid interface
+     */
+    public function orderByRank($order = Criteria::ASC)
+    {
+        $order = strtoupper($order);
+        switch ($order) {
+            case Criteria::ASC:
+                return $this->addAscendingOrderByColumn($this->getAliasedColName(WorkTableMap::RANK_COL));
+                break;
+            case Criteria::DESC:
+                return $this->addDescendingOrderByColumn($this->getAliasedColName(WorkTableMap::RANK_COL));
+                break;
+            default:
+                throw new \Propel\Runtime\Exception\PropelException('ChildWorkQuery::orderBy() only accepts "asc" or "desc" as argument');
+        }
+    }
+    
+    /**
+     * Get an item from the list based on its rank
+     *
+     * @param     integer   $rank rank
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    ChildWork
+     */
+    public function findOneByRank($rank, ConnectionInterface $con = null)
+    {
+    
+        return $this
+            ->filterByRank($rank)
+            ->findOne($con);
+    }
+    
+    /**
+     * Returns the list of objects
+     *
+     * @param      ConnectionInterface $con    Connection to use.
+     *
+     * @return     mixed the list of results, formatted by the current formatter
+     */
+    public function findList($con = null)
+    {
+    
+        return $this
+            ->orderByRank()
+            ->find($con);
+    }
+    
+    /**
+     * Get the highest rank
+     * 
+     * @param     ConnectionInterface optional connection
+     *
+     * @return    integer highest position
+     */
+    public function getMaxRank(ConnectionInterface $con = null)
+    {
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getReadConnection(WorkTableMap::DATABASE_NAME);
+        }
+        // shift the objects with a position lower than the one of object
+        $this->addSelectColumn('MAX(' . WorkTableMap::RANK_COL . ')');
+        $stmt = $this->doSelect($con);
+    
+        return $stmt->fetchColumn();
+    }
+    
+    /**
+     * Get the highest rank by a scope with a array format.
+     * 
+     * @param     ConnectionInterface optional connection
+     *
+     * @return    integer highest position
+     */
+    public function getMaxRankArray(ConnectionInterface $con = null)
+    {
+        if ($con === null) {
+            $con = Propel::getConnection(WorkTableMap::DATABASE_NAME);
+        }
+        // shift the objects with a position lower than the one of object
+        $this->addSelectColumn('MAX(' . WorkTableMap::RANK_COL . ')');
+        $stmt = $this->doSelect($con);
+    
+        return $stmt->fetchColumn();
+    }
+    
+    /**
+     * Get an item from the list based on its rank
+     *
+     * @param     integer   $rank rank
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return ChildWork
+     */
+    static public function retrieveByRank($rank, ConnectionInterface $con = null)
+    {
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getReadConnection(WorkTableMap::DATABASE_NAME);
+        }
+    
+        $c = new Criteria;
+        $c->add(WorkTableMap::RANK_COL, $rank);
+    
+        return static::create(null, $c)->findOne($con);
+    }
+    
+    /**
+     * Reorder a set of sortable objects based on a list of id/position
+     * Beware that there is no check made on the positions passed
+     * So incoherent positions will result in an incoherent list
+     *
+     * @param     mixed               $order id => rank pairs
+     * @param     ConnectionInterface $con   optional connection
+     *
+     * @return    boolean true if the reordering took place, false if a database problem prevented it
+     */
+    public function reorder($order, ConnectionInterface $con = null)
+    {
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getReadConnection(WorkTableMap::DATABASE_NAME);
+        }
+    
+        $con->transaction(function () use ($con, $order) {
+            $ids = array_keys($order);
+            $objects = $this->findPks($ids, $con);
+            foreach ($objects as $object) {
+                $pk = $object->getPrimaryKey();
+                if ($object->getSortableRank() != $order[$pk]) {
+                    $object->setSortableRank($order[$pk]);
+                    $object->save($con);
+                }
+            }
+        });
+    
+        return true;
+    }
+    
+    /**
+     * Return an array of sortable objects ordered by position
+     *
+     * @param     Criteria  $criteria  optional criteria object
+     * @param     string    $order     sorting order, to be chosen between Criteria::ASC (default) and Criteria::DESC
+     * @param     ConnectionInterface $con       optional connection
+     *
+     * @return    array list of sortable objects
+     */
+    static public function doSelectOrderByRank(Criteria $criteria = null, $order = Criteria::ASC, ConnectionInterface $con = null)
+    {
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getReadConnection(WorkTableMap::DATABASE_NAME);
+        }
+    
+        if (null === $criteria) {
+            $criteria = new Criteria();
+        } elseif ($criteria instanceof Criteria) {
+            $criteria = clone $criteria;
+        }
+    
+        $criteria->clearOrderByColumns();
+    
+        if (Criteria::ASC == $order) {
+            $criteria->addAscendingOrderByColumn(WorkTableMap::RANK_COL);
+        } else {
+            $criteria->addDescendingOrderByColumn(WorkTableMap::RANK_COL);
+        }
+    
+        return ChildWorkQuery::create(null, $criteria)->find($con);
+    }
+    
+    /**
+     * Adds $delta to all Rank values that are >= $first and <= $last.
+     * '$delta' can also be negative.
+     *
+     * @param      int $delta Value to be shifted by, can be negative
+     * @param      int $first First node to be shifted
+     * @param      int $last  Last node to be shifted
+     * @param      ConnectionInterface $con Connection to use.
+     */
+    static public function sortableShiftRank($delta, $first, $last = null, ConnectionInterface $con = null)
+    {
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(WorkTableMap::DATABASE_NAME);
+        }
+    
+        $whereCriteria = new Criteria(WorkTableMap::DATABASE_NAME);
+        $criterion = $whereCriteria->getNewCriterion(WorkTableMap::RANK_COL, $first, Criteria::GREATER_EQUAL);
+        if (null !== $last) {
+            $criterion->addAnd($whereCriteria->getNewCriterion(WorkTableMap::RANK_COL, $last, Criteria::LESS_EQUAL));
+        }
+        $whereCriteria->add($criterion);
+    
+        $valuesCriteria = new Criteria(WorkTableMap::DATABASE_NAME);
+        $valuesCriteria->add(WorkTableMap::RANK_COL, array('raw' => WorkTableMap::RANK_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
+    
+        $whereCriteria->doUpdate($valuesCriteria, $con);
+        WorkTableMap::clearInstancePool();
     }
 
 } // WorkQuery

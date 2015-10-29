@@ -24,9 +24,9 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true" />
         <column name="description" type="longvarchar" required="false" />
-        <column name="order" type="integer" required="true" defaultValue="0" />
         <column name="primary_artist_id" type="integer" required="true"  />
         <column name="canon_id" type="integer" required="true"  />
+        <behavior name="sortable" />
         <!-- foreign keys -->
         <foreign-key foreignTable="artist" phpName="primaryArtist">
             <reference local="primary_artist_id" foreign="id" />
@@ -47,9 +47,9 @@
 
     <table name="milestone" phpName="Milestone">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="order" type="integer" required="true" defaultValue="0" />
         <column name="label" type="varchar" require="false" />
         <column name="work_id" type="integer" required="true"  />
+        <behavior name="sortable" />
         <!--foreign keys -->
         <foreign-key foreignTable="work" phpName="work">
             <reference local="work_id" foreign="id" />

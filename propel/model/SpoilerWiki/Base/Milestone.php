@@ -77,14 +77,6 @@ abstract class Milestone implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the order field.
-     * 
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $order;
-
-    /**
      * The value for the label field.
      * 
      * @var        string
@@ -97,6 +89,13 @@ abstract class Milestone implements ActiveRecordInterface
      * @var        int
      */
     protected $work_id;
+
+    /**
+     * The value for the sortable_rank field.
+     * 
+     * @var        int
+     */
+    protected $sortable_rank;
 
     /**
      * @var        ChildWork
@@ -129,6 +128,14 @@ abstract class Milestone implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
+    // sortable behavior
+    
+    /**
+     * Queries to be executed in the save transaction
+     * @var        array
+     */
+    protected $sortableQueries = array();
+
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildTopic[]
@@ -148,23 +155,10 @@ abstract class Milestone implements ActiveRecordInterface
     protected $summariesScheduledForDeletion = null;
 
     /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->order = 0;
-    }
-
-    /**
      * Initializes internal state of SpoilerWiki\Base\Milestone object.
-     * @see applyDefaults()
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -393,16 +387,6 @@ abstract class Milestone implements ActiveRecordInterface
     }
 
     /**
-     * Get the [order] column value.
-     * 
-     * @return int
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
      * Get the [label] column value.
      * 
      * @return string
@@ -420,6 +404,16 @@ abstract class Milestone implements ActiveRecordInterface
     public function getWorkId()
     {
         return $this->work_id;
+    }
+
+    /**
+     * Get the [sortable_rank] column value.
+     * 
+     * @return int
+     */
+    public function getSortableRank()
+    {
+        return $this->sortable_rank;
     }
 
     /**
@@ -441,26 +435,6 @@ abstract class Milestone implements ActiveRecordInterface
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [order] column.
-     * 
-     * @param int $v new value
-     * @return $this|\SpoilerWiki\Milestone The current object (for fluent API support)
-     */
-    public function setOrder($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->order !== $v) {
-            $this->order = $v;
-            $this->modifiedColumns[MilestoneTableMap::COL_ORDER] = true;
-        }
-
-        return $this;
-    } // setOrder()
 
     /**
      * Set the value of [label] column.
@@ -507,6 +481,26 @@ abstract class Milestone implements ActiveRecordInterface
     } // setWorkId()
 
     /**
+     * Set the value of [sortable_rank] column.
+     * 
+     * @param int $v new value
+     * @return $this|\SpoilerWiki\Milestone The current object (for fluent API support)
+     */
+    public function setSortableRank($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->sortable_rank !== $v) {
+            $this->sortable_rank = $v;
+            $this->modifiedColumns[MilestoneTableMap::COL_SORTABLE_RANK] = true;
+        }
+
+        return $this;
+    } // setSortableRank()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -516,10 +510,6 @@ abstract class Milestone implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->order !== 0) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -549,14 +539,14 @@ abstract class Milestone implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : MilestoneTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MilestoneTableMap::translateFieldName('Order', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->order = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MilestoneTableMap::translateFieldName('Label', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MilestoneTableMap::translateFieldName('Label', TableMap::TYPE_PHPNAME, $indexType)];
             $this->label = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MilestoneTableMap::translateFieldName('WorkId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MilestoneTableMap::translateFieldName('WorkId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->work_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MilestoneTableMap::translateFieldName('SortableRank', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sortable_rank = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -662,6 +652,11 @@ abstract class Milestone implements ActiveRecordInterface
             $deleteQuery = ChildMilestoneQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
+            // sortable behavior
+            
+            ChildMilestoneQuery::sortableShiftRank(-1, $this->getSortableRank() + 1, null, $con);
+            MilestoneTableMap::clearInstancePool();
+
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
@@ -696,8 +691,15 @@ abstract class Milestone implements ActiveRecordInterface
         return $con->transaction(function () use ($con) {
             $isInsert = $this->isNew();
             $ret = $this->preSave($con);
+            // sortable behavior
+            $this->processSortableQueries($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // sortable behavior
+                if (!$this->isColumnModified(MilestoneTableMap::RANK_COL)) {
+                    $this->setSortableRank(ChildMilestoneQuery::create()->getMaxRankArray($con) + 1);
+                }
+
             } else {
                 $ret = $ret && $this->preUpdate($con);
             }
@@ -838,14 +840,14 @@ abstract class Milestone implements ActiveRecordInterface
         if ($this->isColumnModified(MilestoneTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(MilestoneTableMap::COL_ORDER)) {
-            $modifiedColumns[':p' . $index++]  = '`order`';
-        }
         if ($this->isColumnModified(MilestoneTableMap::COL_LABEL)) {
             $modifiedColumns[':p' . $index++]  = '`label`';
         }
         if ($this->isColumnModified(MilestoneTableMap::COL_WORK_ID)) {
             $modifiedColumns[':p' . $index++]  = '`work_id`';
+        }
+        if ($this->isColumnModified(MilestoneTableMap::COL_SORTABLE_RANK)) {
+            $modifiedColumns[':p' . $index++]  = '`sortable_rank`';
         }
 
         $sql = sprintf(
@@ -861,14 +863,14 @@ abstract class Milestone implements ActiveRecordInterface
                     case '`id`':                        
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`order`':                        
-                        $stmt->bindValue($identifier, $this->order, PDO::PARAM_INT);
-                        break;
                     case '`label`':                        
                         $stmt->bindValue($identifier, $this->label, PDO::PARAM_STR);
                         break;
                     case '`work_id`':                        
                         $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
+                        break;
+                    case '`sortable_rank`':                        
+                        $stmt->bindValue($identifier, $this->sortable_rank, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -936,13 +938,13 @@ abstract class Milestone implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getOrder();
-                break;
-            case 2:
                 return $this->getLabel();
                 break;
-            case 3:
+            case 2:
                 return $this->getWorkId();
+                break;
+            case 3:
+                return $this->getSortableRank();
                 break;
             default:
                 return null;
@@ -975,9 +977,9 @@ abstract class Milestone implements ActiveRecordInterface
         $keys = MilestoneTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getOrder(),
-            $keys[2] => $this->getLabel(),
-            $keys[3] => $this->getWorkId(),
+            $keys[1] => $this->getLabel(),
+            $keys[2] => $this->getWorkId(),
+            $keys[3] => $this->getSortableRank(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1083,13 +1085,13 @@ abstract class Milestone implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setOrder($value);
-                break;
-            case 2:
                 $this->setLabel($value);
                 break;
-            case 3:
+            case 2:
                 $this->setWorkId($value);
+                break;
+            case 3:
+                $this->setSortableRank($value);
                 break;
         } // switch()
 
@@ -1121,13 +1123,13 @@ abstract class Milestone implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setOrder($arr[$keys[1]]);
+            $this->setLabel($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setLabel($arr[$keys[2]]);
+            $this->setWorkId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setWorkId($arr[$keys[3]]);
+            $this->setSortableRank($arr[$keys[3]]);
         }
     }
 
@@ -1173,14 +1175,14 @@ abstract class Milestone implements ActiveRecordInterface
         if ($this->isColumnModified(MilestoneTableMap::COL_ID)) {
             $criteria->add(MilestoneTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(MilestoneTableMap::COL_ORDER)) {
-            $criteria->add(MilestoneTableMap::COL_ORDER, $this->order);
-        }
         if ($this->isColumnModified(MilestoneTableMap::COL_LABEL)) {
             $criteria->add(MilestoneTableMap::COL_LABEL, $this->label);
         }
         if ($this->isColumnModified(MilestoneTableMap::COL_WORK_ID)) {
             $criteria->add(MilestoneTableMap::COL_WORK_ID, $this->work_id);
+        }
+        if ($this->isColumnModified(MilestoneTableMap::COL_SORTABLE_RANK)) {
+            $criteria->add(MilestoneTableMap::COL_SORTABLE_RANK, $this->sortable_rank);
         }
 
         return $criteria;
@@ -1268,9 +1270,9 @@ abstract class Milestone implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setOrder($this->getOrder());
         $copyObj->setLabel($this->getLabel());
         $copyObj->setWorkId($this->getWorkId());
+        $copyObj->setSortableRank($this->getSortableRank());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -2138,12 +2140,11 @@ abstract class Milestone implements ActiveRecordInterface
             $this->awork->removeMilestone($this);
         }
         $this->id = null;
-        $this->order = null;
         $this->label = null;
         $this->work_id = null;
+        $this->sortable_rank = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -2191,6 +2192,332 @@ abstract class Milestone implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(MilestoneTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // sortable behavior
+    
+    /**
+     * Wrap the getter for rank value
+     *
+     * @return    int
+     */
+    public function getRank()
+    {
+        return $this->sortable_rank;
+    }
+    
+    /**
+     * Wrap the setter for rank value
+     *
+     * @param     int
+     * @return    $this|ChildMilestone
+     */
+    public function setRank($v)
+    {
+        return $this->setSortableRank($v);
+    }
+    
+    /**
+     * Check if the object is first in the list, i.e. if it has 1 for rank
+     *
+     * @return    boolean
+     */
+    public function isFirst()
+    {
+        return $this->getSortableRank() == 1;
+    }
+    
+    /**
+     * Check if the object is last in the list, i.e. if its rank is the highest rank
+     *
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    boolean
+     */
+    public function isLast(ConnectionInterface $con = null)
+    {
+        return $this->getSortableRank() == ChildMilestoneQuery::create()->getMaxRankArray($con);
+    }
+    
+    /**
+     * Get the next item in the list, i.e. the one for which rank is immediately higher
+     *
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    ChildMilestone
+     */
+    public function getNext(ConnectionInterface $con = null)
+    {
+    
+        $query = ChildMilestoneQuery::create();
+    
+        $query->filterByRank($this->getSortableRank() + 1);
+    
+    
+        return $query->findOne($con);
+    }
+    
+    /**
+     * Get the previous item in the list, i.e. the one for which rank is immediately lower
+     *
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    ChildMilestone
+     */
+    public function getPrevious(ConnectionInterface $con = null)
+    {
+    
+        $query = ChildMilestoneQuery::create();
+    
+        $query->filterByRank($this->getSortableRank() - 1);
+    
+    
+        return $query->findOne($con);
+    }
+    
+    /**
+     * Insert at specified rank
+     * The modifications are not persisted until the object is saved.
+     *
+     * @param     integer    $rank rank value
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    $this|ChildMilestone the current object
+     *
+     * @throws    PropelException
+     */
+    public function insertAtRank($rank, ConnectionInterface $con = null)
+    {
+        $maxRank = ChildMilestoneQuery::create()->getMaxRankArray($con);
+        if ($rank < 1 || $rank > $maxRank + 1) {
+            throw new PropelException('Invalid rank ' . $rank);
+        }
+        // move the object in the list, at the given rank
+        $this->setSortableRank($rank);
+        if ($rank != $maxRank + 1) {
+            // Keep the list modification query for the save() transaction
+            $this->sortableQueries []= array(
+                'callable'  => array('\SpoilerWiki\MilestoneQuery', 'sortableShiftRank'),
+                'arguments' => array(1, $rank, null, )
+            );
+        }
+    
+        return $this;
+    }
+    
+    /**
+     * Insert in the last rank
+     * The modifications are not persisted until the object is saved.
+     *
+     * @param ConnectionInterface $con optional connection
+     *
+     * @return    $this|ChildMilestone the current object
+     *
+     * @throws    PropelException
+     */
+    public function insertAtBottom(ConnectionInterface $con = null)
+    {
+        $this->setSortableRank(ChildMilestoneQuery::create()->getMaxRankArray($con) + 1);
+    
+        return $this;
+    }
+    
+    /**
+     * Insert in the first rank
+     * The modifications are not persisted until the object is saved.
+     *
+     * @return    $this|ChildMilestone the current object
+     */
+    public function insertAtTop()
+    {
+        return $this->insertAtRank(1);
+    }
+    
+    /**
+     * Move the object to a new rank, and shifts the rank
+     * Of the objects inbetween the old and new rank accordingly
+     *
+     * @param     integer   $newRank rank value
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    $this|ChildMilestone the current object
+     *
+     * @throws    PropelException
+     */
+    public function moveToRank($newRank, ConnectionInterface $con = null)
+    {
+        if ($this->isNew()) {
+            throw new PropelException('New objects cannot be moved. Please use insertAtRank() instead');
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(MilestoneTableMap::DATABASE_NAME);
+        }
+        if ($newRank < 1 || $newRank > ChildMilestoneQuery::create()->getMaxRankArray($con)) {
+            throw new PropelException('Invalid rank ' . $newRank);
+        }
+    
+        $oldRank = $this->getSortableRank();
+        if ($oldRank == $newRank) {
+            return $this;
+        }
+    
+        $con->transaction(function () use ($con, $oldRank, $newRank) {
+            // shift the objects between the old and the new rank
+            $delta = ($oldRank < $newRank) ? -1 : 1;
+            ChildMilestoneQuery::sortableShiftRank($delta, min($oldRank, $newRank), max($oldRank, $newRank), $con);
+    
+            // move the object to its new rank
+            $this->setSortableRank($newRank);
+            $this->save($con);
+        });
+    
+        return $this;
+    }
+    
+    /**
+     * Exchange the rank of the object with the one passed as argument, and saves both objects
+     *
+     * @param     ChildMilestone $object
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    $this|ChildMilestone the current object
+     *
+     * @throws Exception if the database cannot execute the two updates
+     */
+    public function swapWith($object, ConnectionInterface $con = null)
+    {
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(MilestoneTableMap::DATABASE_NAME);
+        }
+        $con->transaction(function () use ($con, $object) {
+            $oldRank = $this->getSortableRank();
+            $newRank = $object->getSortableRank();
+    
+            $this->setSortableRank($newRank);
+            $object->setSortableRank($oldRank);
+    
+            $this->save($con);
+            $object->save($con);
+        });
+    
+        return $this;
+    }
+    
+    /**
+     * Move the object higher in the list, i.e. exchanges its rank with the one of the previous object
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    $this|ChildMilestone the current object
+     */
+    public function moveUp(ConnectionInterface $con = null)
+    {
+        if ($this->isFirst()) {
+            return $this;
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(MilestoneTableMap::DATABASE_NAME);
+        }
+        $con->transaction(function () use ($con) {
+            $prev = $this->getPrevious($con);
+            $this->swapWith($prev, $con);
+        });
+    
+        return $this;
+    }
+    
+    /**
+     * Move the object higher in the list, i.e. exchanges its rank with the one of the next object
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    $this|ChildMilestone the current object
+     */
+    public function moveDown(ConnectionInterface $con = null)
+    {
+        if ($this->isLast($con)) {
+            return $this;
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(MilestoneTableMap::DATABASE_NAME);
+        }
+        $con->transaction(function () use ($con) {
+            $next = $this->getNext($con);
+            $this->swapWith($next, $con);
+        });
+    
+        return $this;
+    }
+    
+    /**
+     * Move the object to the top of the list
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    $this|ChildMilestone the current object
+     */
+    public function moveToTop(ConnectionInterface $con = null)
+    {
+        if ($this->isFirst()) {
+            return $this;
+        }
+    
+        return $this->moveToRank(1, $con);
+    }
+    
+    /**
+     * Move the object to the bottom of the list
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return integer the old object's rank
+     */
+    public function moveToBottom(ConnectionInterface $con = null)
+    {
+        if ($this->isLast($con)) {
+            return false;
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(MilestoneTableMap::DATABASE_NAME);
+        }
+    
+        return $con->transaction(function () use ($con) {
+            $bottom = ChildMilestoneQuery::create()->getMaxRankArray($con);
+    
+            return $this->moveToRank($bottom, $con);
+        });
+    }
+    
+    /**
+     * Removes the current object from the list.
+     * The modifications are not persisted until the object is saved.
+     *
+     * @return    $this|ChildMilestone the current object
+     */
+    public function removeFromList()
+    {
+        // Keep the list modification query for the save() transaction
+        $this->sortableQueries[] = array(
+            'callable'  => array('\SpoilerWiki\MilestoneQuery', 'sortableShiftRank'),
+            'arguments' => array(-1, $this->getSortableRank() + 1, null)
+        );
+        // remove the object from the list
+        $this->setSortableRank(null);
+        
+    
+        return $this;
+    }
+    
+    /**
+     * Execute queries that were saved to be run inside the save transaction
+     */
+    protected function processSortableQueries($con)
+    {
+        foreach ($this->sortableQueries as $query) {
+            $query['arguments'][]= $con;
+            call_user_func_array($query['callable'], $query['arguments']);
+        }
+        $this->sortableQueries = array();
     }
 
     /**

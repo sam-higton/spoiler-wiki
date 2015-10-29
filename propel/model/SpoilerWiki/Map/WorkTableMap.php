@@ -87,11 +87,6 @@ class WorkTableMap extends TableMap
     const COL_DESCRIPTION = 'work.description';
 
     /**
-     * the column name for the order field
-     */
-    const COL_ORDER = 'work.order';
-
-    /**
      * the column name for the primary_artist_id field
      */
     const COL_PRIMARY_ARTIST_ID = 'work.primary_artist_id';
@@ -102,9 +97,21 @@ class WorkTableMap extends TableMap
     const COL_CANON_ID = 'work.canon_id';
 
     /**
+     * the column name for the sortable_rank field
+     */
+    const COL_SORTABLE_RANK = 'work.sortable_rank';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
+
+    // sortable behavior
+    /**
+     * rank column
+     */
+    const RANK_COL = "work.sortable_rank";
+    
 
     /**
      * holds an array of fieldnames
@@ -113,10 +120,10 @@ class WorkTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', 'Order', 'PrimaryArtistId', 'CanonId', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'description', 'order', 'primaryArtistId', 'canonId', ),
-        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID, WorkTableMap::COL_NAME, WorkTableMap::COL_DESCRIPTION, WorkTableMap::COL_ORDER, WorkTableMap::COL_PRIMARY_ARTIST_ID, WorkTableMap::COL_CANON_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'description', 'order', 'primary_artist_id', 'canon_id', ),
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', 'PrimaryArtistId', 'CanonId', 'SortableRank', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'description', 'primaryArtistId', 'canonId', 'sortableRank', ),
+        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID, WorkTableMap::COL_NAME, WorkTableMap::COL_DESCRIPTION, WorkTableMap::COL_PRIMARY_ARTIST_ID, WorkTableMap::COL_CANON_ID, WorkTableMap::COL_SORTABLE_RANK, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'description', 'primary_artist_id', 'canon_id', 'sortable_rank', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -127,10 +134,10 @@ class WorkTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, 'Order' => 3, 'PrimaryArtistId' => 4, 'CanonId' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'order' => 3, 'primaryArtistId' => 4, 'canonId' => 5, ),
-        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID => 0, WorkTableMap::COL_NAME => 1, WorkTableMap::COL_DESCRIPTION => 2, WorkTableMap::COL_ORDER => 3, WorkTableMap::COL_PRIMARY_ARTIST_ID => 4, WorkTableMap::COL_CANON_ID => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'order' => 3, 'primary_artist_id' => 4, 'canon_id' => 5, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, 'PrimaryArtistId' => 3, 'CanonId' => 4, 'SortableRank' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primaryArtistId' => 3, 'canonId' => 4, 'sortableRank' => 5, ),
+        self::TYPE_COLNAME       => array(WorkTableMap::COL_ID => 0, WorkTableMap::COL_NAME => 1, WorkTableMap::COL_DESCRIPTION => 2, WorkTableMap::COL_PRIMARY_ARTIST_ID => 3, WorkTableMap::COL_CANON_ID => 4, WorkTableMap::COL_SORTABLE_RANK => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, 'primary_artist_id' => 3, 'canon_id' => 4, 'sortable_rank' => 5, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -154,9 +161,9 @@ class WorkTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('order', 'Order', 'INTEGER', true, null, 0);
         $this->addForeignKey('primary_artist_id', 'PrimaryArtistId', 'INTEGER', 'artist', 'id', true, null, null);
         $this->addForeignKey('canon_id', 'CanonId', 'INTEGER', 'canon', 'id', true, null, null);
+        $this->addColumn('sortable_rank', 'SortableRank', 'INTEGER', false, null, null);
     } // initialize()
 
     /**
@@ -186,6 +193,19 @@ class WorkTableMap extends TableMap
   ),
 ), null, null, 'Milestones', false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'sortable' => array('rank_column' => 'sortable_rank', 'use_scope' => 'false', 'scope_column' => '', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -331,16 +351,16 @@ class WorkTableMap extends TableMap
             $criteria->addSelectColumn(WorkTableMap::COL_ID);
             $criteria->addSelectColumn(WorkTableMap::COL_NAME);
             $criteria->addSelectColumn(WorkTableMap::COL_DESCRIPTION);
-            $criteria->addSelectColumn(WorkTableMap::COL_ORDER);
             $criteria->addSelectColumn(WorkTableMap::COL_PRIMARY_ARTIST_ID);
             $criteria->addSelectColumn(WorkTableMap::COL_CANON_ID);
+            $criteria->addSelectColumn(WorkTableMap::COL_SORTABLE_RANK);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.description');
-            $criteria->addSelectColumn($alias . '.order');
             $criteria->addSelectColumn($alias . '.primary_artist_id');
             $criteria->addSelectColumn($alias . '.canon_id');
+            $criteria->addSelectColumn($alias . '.sortable_rank');
         }
     }
 

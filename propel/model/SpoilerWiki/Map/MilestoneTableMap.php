@@ -77,11 +77,6 @@ class MilestoneTableMap extends TableMap
     const COL_ID = 'milestone.id';
 
     /**
-     * the column name for the order field
-     */
-    const COL_ORDER = 'milestone.order';
-
-    /**
      * the column name for the label field
      */
     const COL_LABEL = 'milestone.label';
@@ -92,9 +87,21 @@ class MilestoneTableMap extends TableMap
     const COL_WORK_ID = 'milestone.work_id';
 
     /**
+     * the column name for the sortable_rank field
+     */
+    const COL_SORTABLE_RANK = 'milestone.sortable_rank';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
+
+    // sortable behavior
+    /**
+     * rank column
+     */
+    const RANK_COL = "milestone.sortable_rank";
+    
 
     /**
      * holds an array of fieldnames
@@ -103,10 +110,10 @@ class MilestoneTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Order', 'Label', 'WorkId', ),
-        self::TYPE_CAMELNAME     => array('id', 'order', 'label', 'workId', ),
-        self::TYPE_COLNAME       => array(MilestoneTableMap::COL_ID, MilestoneTableMap::COL_ORDER, MilestoneTableMap::COL_LABEL, MilestoneTableMap::COL_WORK_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'order', 'label', 'work_id', ),
+        self::TYPE_PHPNAME       => array('Id', 'Label', 'WorkId', 'SortableRank', ),
+        self::TYPE_CAMELNAME     => array('id', 'label', 'workId', 'sortableRank', ),
+        self::TYPE_COLNAME       => array(MilestoneTableMap::COL_ID, MilestoneTableMap::COL_LABEL, MilestoneTableMap::COL_WORK_ID, MilestoneTableMap::COL_SORTABLE_RANK, ),
+        self::TYPE_FIELDNAME     => array('id', 'label', 'work_id', 'sortable_rank', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -117,10 +124,10 @@ class MilestoneTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Order' => 1, 'Label' => 2, 'WorkId' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'order' => 1, 'label' => 2, 'workId' => 3, ),
-        self::TYPE_COLNAME       => array(MilestoneTableMap::COL_ID => 0, MilestoneTableMap::COL_ORDER => 1, MilestoneTableMap::COL_LABEL => 2, MilestoneTableMap::COL_WORK_ID => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order' => 1, 'label' => 2, 'work_id' => 3, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Label' => 1, 'WorkId' => 2, 'SortableRank' => 3, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'label' => 1, 'workId' => 2, 'sortableRank' => 3, ),
+        self::TYPE_COLNAME       => array(MilestoneTableMap::COL_ID => 0, MilestoneTableMap::COL_LABEL => 1, MilestoneTableMap::COL_WORK_ID => 2, MilestoneTableMap::COL_SORTABLE_RANK => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'label' => 1, 'work_id' => 2, 'sortable_rank' => 3, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -142,9 +149,9 @@ class MilestoneTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('order', 'Order', 'INTEGER', true, null, 0);
         $this->addColumn('label', 'Label', 'VARCHAR', false, 255, null);
         $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
+        $this->addColumn('sortable_rank', 'SortableRank', 'INTEGER', false, null, null);
     } // initialize()
 
     /**
@@ -181,6 +188,19 @@ class MilestoneTableMap extends TableMap
   ),
 ), null, null, 'Summaries', false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'sortable' => array('rank_column' => 'sortable_rank', 'use_scope' => 'false', 'scope_column' => '', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -324,14 +344,14 @@ class MilestoneTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(MilestoneTableMap::COL_ID);
-            $criteria->addSelectColumn(MilestoneTableMap::COL_ORDER);
             $criteria->addSelectColumn(MilestoneTableMap::COL_LABEL);
             $criteria->addSelectColumn(MilestoneTableMap::COL_WORK_ID);
+            $criteria->addSelectColumn(MilestoneTableMap::COL_SORTABLE_RANK);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.order');
             $criteria->addSelectColumn($alias . '.label');
             $criteria->addSelectColumn($alias . '.work_id');
+            $criteria->addSelectColumn($alias . '.sortable_rank');
         }
     }
 

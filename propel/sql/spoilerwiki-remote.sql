@@ -52,9 +52,9 @@ CREATE TABLE `work`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
     `description` TEXT,
-    `order` INTEGER DEFAULT 0 NOT NULL,
     `primary_artist_id` INTEGER NOT NULL,
     `canon_id` INTEGER NOT NULL,
+    `sortable_rank` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `work_fi_2233f1` (`primary_artist_id`),
     INDEX `work_fi_eeb6b0` (`canon_id`),
@@ -90,9 +90,9 @@ DROP TABLE IF EXISTS `milestone`;
 CREATE TABLE `milestone`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `order` INTEGER DEFAULT 0 NOT NULL,
     `label` VARCHAR(255),
     `work_id` INTEGER NOT NULL,
+    `sortable_rank` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `milestone_fi_9cf5e3` (`work_id`),
     CONSTRAINT `milestone_fk_9cf5e3`
