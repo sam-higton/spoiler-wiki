@@ -23,7 +23,7 @@ $app->get('/topic/:id', function ($topicId) use ($app) {
     $app->view()->display('topic.twig', array());
 });
 
-$propelApi = new \SpoilerWiki\PropelApi($app,'../schema.xml');
+$propelApi = new \PropelToSlim\PropelToSlim($app,'../schema.xml');
 $propelApi->generateRoutes();
 
 $app->run();

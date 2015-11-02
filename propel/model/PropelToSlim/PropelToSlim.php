@@ -1,8 +1,8 @@
 <?php
 
-namespace SpoilerWiki;
+namespace PropelToSlim;
 
-class PropelApi {
+class PropelToSlim {
     private $pathToSchema;
     /** @var  \Slim\Slim $slimApp */
     private $slimApp;
@@ -24,7 +24,7 @@ class PropelApi {
 
     public function generateRoutes () {
         foreach($this->schema->table as $table) {
-            $tableName = $table['name'];
+            $tableName = $this->_urlFriendly($table['name']);
             $this->slimApp->post($this->apiBasePath . "add-" . $tableName, $this->_addRecord($table));
             $this->slimApp->get($this->apiBasePath . "fetch-" . $tableName . "s", $this->_fetchRecords($table));
             $this->slimApp->get($this->apiBasePath . "get-" . $tableName . "/:id", $this->_getRecord($table));
@@ -108,6 +108,10 @@ class PropelApi {
             array_push($formattedResults, $result->toArray());
         }
         return $formattedResults;
+    }
+
+    private function _urlFriendly ($part) {
+        return str_replace('_','-',$part);
     }
 
      private function _toCamelCase($string, $capitalizeFirstCharacter = false) {
