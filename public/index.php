@@ -23,7 +23,7 @@ $app->get('/topic/:id', function ($topicId) use ($app) {
     $app->view()->display('topic.twig', array());
 });
 
-$app->post('/api/generate-artist', function () use ($app) {
+/*$app->post('/api/generate-artist', function () use ($app) {
     $name = $app->request->post('name');
     $bio = $app->request->post('bio');
 
@@ -60,7 +60,7 @@ $app->post('/api/generate-work', function () use ($app) {
     $work = new \SpoilerWiki\Work();
     $work->setName($name);
     $work->setDescription($description);
-    $work->setOrder($order);
+    $work->setRank($order);
     $work->setPrimaryArtistId($artistId);
     $work->setCanonId($canonId);
 
@@ -88,6 +88,9 @@ $app->post('/api/generate-topic', function () use ($app) {
 
 $app->post('/api/generate-milestone', function () use ($app) {
 
-});
+});*/
+
+$propelApi = new \SpoilerWiki\PropelApi($app,'../schema.xml');
+$propelApi->generateRoutes();
 
 $app->run();
