@@ -48,9 +48,15 @@ class PropelToSlim {
                     $objectArray[$this->_toCamelCase($field['name'], true)] = $app->request->post($field['name']);
                 }
             }
-
             $propelObject = $this->_getObject($table);
             $propelObject->fromArray($objectArray);
+
+            foreach($table->behavior as $behavior) {
+                if($behavior['name'] == "sortable") {
+                    $propelObject->setRank($app->request->post('rank'));
+                }
+            }
+
             $propelObject->save();
             $objectId = $propelObject->getId();
             $this->responseObject->setStatus("success");
