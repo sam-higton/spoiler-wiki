@@ -25,34 +25,28 @@ class PropelApi {
     public function generateRoutes () {
         foreach($this->schema->table as $table) {
             $tableName = $table['name'];
-            $app = $this->slimApp;
-            $this->slimApp->post($this->apiBasePath . "generate-" . $tableName, $this->_addRecord($app, $table));
+            $this->slimApp->post($this->apiBasePath . "add-" . $tableName, $this->_addRecord($table));
+            $this->slimApp->get($this->apiBasePath . "fetch-" . $tableName . "s", $this->_fetchRecords($table));
+            $this->slimApp->get($this->apiBasePath . "get-" . $tableName . "/:id", $this->_getRecord($table));
+            $this->slimApp->get($this->apiBasePath . "get-" . $tableName . "-by/:key/:value", $this->_getRecordBy($table));
         }
 
     }
 
-    private function _addRecord  ($app, $table) {
-
+    private function _addRecord  ($table) {
+        $app = $this->slimApp;
         return function () use ($app, $table) {
 
-            $fieldList = array();
-
-            foreach($table->column as $column) {
-                array_push($fieldList, array (
-                    "name" => (string) $column['name'],
-                    "phpName" => (string) $column['phpName']
-                ));
-            }
+            $tableColumns = $this->_getTableColumnMap($table);
 
             $objectArray = array();
-            foreach($fieldList as $field) {
+            foreach($tableColumns as $field) {
                 if($field['name'] !== "id") {
                     $objectArray[$this->_toCamelCase($field['name'], true)] = $app->request->post($field['name']);
                 }
             }
 
-            $className = $this->modelNameSpace . "\\" . $table['phpName'];
-            $propelObject = new $className();
+            $propelObject = $this->_getObject($table);
             $propelObject->fromArray($objectArray);
             $propelObject->save();
             $objectId = $propelObject->getId();
@@ -60,6 +54,60 @@ class PropelApi {
 
         };
 
+    }
+
+    private function _fetchRecords ($table) {
+        $app = $this->slimApp;
+        return  function () use ($app, $table) {
+            $queryObject = $this->_getQueryObject($table);
+            $results = $this->_processResults($queryObject->find());
+            echo json_encode($results);
+        };
+    }
+
+    private function _getRecord($table) {
+        $app = $this->slimApp;
+        return  function ($id) use ($app, $table) {
+
+        };
+    }
+
+    private function _getRecordBy($table) {
+        $app = $this->slimApp;
+        return  function ($key,$value) use ($app, $table) {
+
+        };
+    }
+
+    private function _getTableColumnMap ($table) {
+        $fieldList = array();
+        foreach($table->column as $column) {
+            array_push($fieldList, array (
+                "name" => (string) $column['name'],
+                "phpName" => (string) $column['phpName']
+            ));
+        }
+        return $fieldList;
+    }
+
+    private function _getObject ($table) {
+        $className = $this->modelNameSpace . "\\" . $table['phpName'];
+        $propelObject = new $className();
+        return $propelObject;
+    }
+
+    private function _getQueryObject ($table) {
+        $queryClassName = $this->modelNameSpace . "\\" . $table['phpName'] . "Query";
+        $queryObject = new $queryClassName();
+        return $queryObject;
+    }
+
+    private function _processResults($results) {
+        $formattedResults = array();
+        foreach($results as $result) {
+            array_push($formattedResults, $result->toArray());
+        }
+        return $formattedResults;
     }
 
      private function _toCamelCase($string, $capitalizeFirstCharacter = false) {
