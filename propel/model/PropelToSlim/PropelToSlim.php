@@ -9,11 +9,14 @@ class PropelToSlim {
     private $apiBasePath = "/api/";
     private $modelNameSpace;
     private $schema;
+    /** @var ResponseObject\ResponseObjectInterface  $responseObject */
+    private $responseObject;
 
     public function __construct ($app, $pathToSchema) {
         $this->slimApp =  $app;
         $this->pathToSchema = $pathToSchema;
         $this->loadSchema();
+        $this->responseObject = new ResponseObject\JsonResponseObject();
     }
 
     public function loadSchema () {
@@ -50,7 +53,9 @@ class PropelToSlim {
             $propelObject->fromArray($objectArray);
             $propelObject->save();
             $objectId = $propelObject->getId();
-            echo "new " . $table['phpName'] . ' id: ' . $objectId;
+            $this->responseObject->setStatus("success");
+            $this->responseObject->addField("objectId", $objectId);
+            $this->responseObject->renderOutput();
 
         };
 
@@ -61,7 +66,9 @@ class PropelToSlim {
         return  function () use ($app, $table) {
             $queryObject = $this->_getQueryObject($table);
             $results = $this->_processResults($queryObject->find());
-            echo json_encode($results);
+            $this->responseObject->setStatus("success");
+            $this->responseObject->addField("resultList", $results);
+            $this->responseObject->renderOutput();
         };
     }
 

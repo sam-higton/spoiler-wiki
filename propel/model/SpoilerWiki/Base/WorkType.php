@@ -358,7 +358,7 @@ abstract class WorkType implements ActiveRecordInterface
      * 
      * @return string
      */
-    public function getworkLabel()
+    public function getWorkLabel()
     {
         return $this->work_label;
     }
@@ -368,7 +368,7 @@ abstract class WorkType implements ActiveRecordInterface
      * 
      * @return string
      */
-    public function getmilestoneLabel()
+    public function getMilestoneLabel()
     {
         return $this->milestone_label;
     }
@@ -419,7 +419,7 @@ abstract class WorkType implements ActiveRecordInterface
      * @param string $v new value
      * @return $this|\SpoilerWiki\WorkType The current object (for fluent API support)
      */
-    public function setworkLabel($v)
+    public function setWorkLabel($v)
     {
         if ($v !== null) {
             $v = (string) $v;
@@ -431,7 +431,7 @@ abstract class WorkType implements ActiveRecordInterface
         }
 
         return $this;
-    } // setworkLabel()
+    } // setWorkLabel()
 
     /**
      * Set the value of [milestone_label] column.
@@ -439,7 +439,7 @@ abstract class WorkType implements ActiveRecordInterface
      * @param string $v new value
      * @return $this|\SpoilerWiki\WorkType The current object (for fluent API support)
      */
-    public function setmilestoneLabel($v)
+    public function setMilestoneLabel($v)
     {
         if ($v !== null) {
             $v = (string) $v;
@@ -451,7 +451,7 @@ abstract class WorkType implements ActiveRecordInterface
         }
 
         return $this;
-    } // setmilestoneLabel()
+    } // setMilestoneLabel()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -495,10 +495,10 @@ abstract class WorkType implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : WorkTypeTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : WorkTypeTableMap::translateFieldName('workLabel', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : WorkTypeTableMap::translateFieldName('WorkLabel', TableMap::TYPE_PHPNAME, $indexType)];
             $this->work_label = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : WorkTypeTableMap::translateFieldName('milestoneLabel', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : WorkTypeTableMap::translateFieldName('MilestoneLabel', TableMap::TYPE_PHPNAME, $indexType)];
             $this->milestone_label = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -828,10 +828,10 @@ abstract class WorkType implements ActiveRecordInterface
                 return $this->getName();
                 break;
             case 2:
-                return $this->getworkLabel();
+                return $this->getWorkLabel();
                 break;
             case 3:
-                return $this->getmilestoneLabel();
+                return $this->getMilestoneLabel();
                 break;
             default:
                 return null;
@@ -865,8 +865,8 @@ abstract class WorkType implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getworkLabel(),
-            $keys[3] => $this->getmilestoneLabel(),
+            $keys[2] => $this->getWorkLabel(),
+            $keys[3] => $this->getMilestoneLabel(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -930,10 +930,10 @@ abstract class WorkType implements ActiveRecordInterface
                 $this->setName($value);
                 break;
             case 2:
-                $this->setworkLabel($value);
+                $this->setWorkLabel($value);
                 break;
             case 3:
-                $this->setmilestoneLabel($value);
+                $this->setMilestoneLabel($value);
                 break;
         } // switch()
 
@@ -968,10 +968,10 @@ abstract class WorkType implements ActiveRecordInterface
             $this->setName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setworkLabel($arr[$keys[2]]);
+            $this->setWorkLabel($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setmilestoneLabel($arr[$keys[3]]);
+            $this->setMilestoneLabel($arr[$keys[3]]);
         }
     }
 
@@ -1113,8 +1113,8 @@ abstract class WorkType implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setworkLabel($this->getworkLabel());
-        $copyObj->setmilestoneLabel($this->getmilestoneLabel());
+        $copyObj->setWorkLabel($this->getWorkLabel());
+        $copyObj->setMilestoneLabel($this->getMilestoneLabel());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of

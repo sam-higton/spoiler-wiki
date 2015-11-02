@@ -103,7 +103,7 @@ class WorkTypeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'workLabel', 'milestoneLabel', ),
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'WorkLabel', 'MilestoneLabel', ),
         self::TYPE_CAMELNAME     => array('id', 'name', 'workLabel', 'milestoneLabel', ),
         self::TYPE_COLNAME       => array(WorkTypeTableMap::COL_ID, WorkTypeTableMap::COL_NAME, WorkTypeTableMap::COL_WORK_LABEL, WorkTypeTableMap::COL_MILESTONE_LABEL, ),
         self::TYPE_FIELDNAME     => array('id', 'name', 'work_label', 'milestone_label', ),
@@ -117,7 +117,7 @@ class WorkTypeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'workLabel' => 2, 'milestoneLabel' => 3, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'WorkLabel' => 2, 'MilestoneLabel' => 3, ),
         self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'workLabel' => 2, 'milestoneLabel' => 3, ),
         self::TYPE_COLNAME       => array(WorkTypeTableMap::COL_ID => 0, WorkTypeTableMap::COL_NAME => 1, WorkTypeTableMap::COL_WORK_LABEL => 2, WorkTypeTableMap::COL_MILESTONE_LABEL => 3, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'work_label' => 2, 'milestone_label' => 3, ),
@@ -143,8 +143,8 @@ class WorkTypeTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
-        $this->addColumn('work_label', 'workLabel', 'VARCHAR', true, 255, null);
-        $this->addColumn('milestone_label', 'milestoneLabel', 'VARCHAR', true, 255, null);
+        $this->addColumn('work_label', 'WorkLabel', 'VARCHAR', true, 255, null);
+        $this->addColumn('milestone_label', 'MilestoneLabel', 'VARCHAR', true, 255, null);
     } // initialize()
 
     /**

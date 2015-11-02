@@ -22,13 +22,13 @@ use SpoilerWiki\Map\WorkTypeTableMap;
  *
  * @method     ChildWorkTypeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildWorkTypeQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildWorkTypeQuery orderByworkLabel($order = Criteria::ASC) Order by the work_label column
- * @method     ChildWorkTypeQuery orderBymilestoneLabel($order = Criteria::ASC) Order by the milestone_label column
+ * @method     ChildWorkTypeQuery orderByWorkLabel($order = Criteria::ASC) Order by the work_label column
+ * @method     ChildWorkTypeQuery orderByMilestoneLabel($order = Criteria::ASC) Order by the milestone_label column
  *
  * @method     ChildWorkTypeQuery groupById() Group by the id column
  * @method     ChildWorkTypeQuery groupByName() Group by the name column
- * @method     ChildWorkTypeQuery groupByworkLabel() Group by the work_label column
- * @method     ChildWorkTypeQuery groupBymilestoneLabel() Group by the milestone_label column
+ * @method     ChildWorkTypeQuery groupByWorkLabel() Group by the work_label column
+ * @method     ChildWorkTypeQuery groupByMilestoneLabel() Group by the milestone_label column
  *
  * @method     ChildWorkTypeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildWorkTypeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -55,22 +55,22 @@ use SpoilerWiki\Map\WorkTypeTableMap;
  *
  * @method     ChildWorkType findOneById(int $id) Return the first ChildWorkType filtered by the id column
  * @method     ChildWorkType findOneByName(string $name) Return the first ChildWorkType filtered by the name column
- * @method     ChildWorkType findOneByworkLabel(string $work_label) Return the first ChildWorkType filtered by the work_label column
- * @method     ChildWorkType findOneBymilestoneLabel(string $milestone_label) Return the first ChildWorkType filtered by the milestone_label column *
+ * @method     ChildWorkType findOneByWorkLabel(string $work_label) Return the first ChildWorkType filtered by the work_label column
+ * @method     ChildWorkType findOneByMilestoneLabel(string $milestone_label) Return the first ChildWorkType filtered by the milestone_label column *
 
  * @method     ChildWorkType requirePk($key, ConnectionInterface $con = null) Return the ChildWorkType by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWorkType requireOne(ConnectionInterface $con = null) Return the first ChildWorkType matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildWorkType requireOneById(int $id) Return the first ChildWorkType filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildWorkType requireOneByName(string $name) Return the first ChildWorkType filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildWorkType requireOneByworkLabel(string $work_label) Return the first ChildWorkType filtered by the work_label column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildWorkType requireOneBymilestoneLabel(string $milestone_label) Return the first ChildWorkType filtered by the milestone_label column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildWorkType requireOneByWorkLabel(string $work_label) Return the first ChildWorkType filtered by the work_label column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildWorkType requireOneByMilestoneLabel(string $milestone_label) Return the first ChildWorkType filtered by the milestone_label column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildWorkType[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildWorkType objects based on current ModelCriteria
  * @method     ChildWorkType[]|ObjectCollection findById(int $id) Return ChildWorkType objects filtered by the id column
  * @method     ChildWorkType[]|ObjectCollection findByName(string $name) Return ChildWorkType objects filtered by the name column
- * @method     ChildWorkType[]|ObjectCollection findByworkLabel(string $work_label) Return ChildWorkType objects filtered by the work_label column
- * @method     ChildWorkType[]|ObjectCollection findBymilestoneLabel(string $milestone_label) Return ChildWorkType objects filtered by the milestone_label column
+ * @method     ChildWorkType[]|ObjectCollection findByWorkLabel(string $work_label) Return ChildWorkType objects filtered by the work_label column
+ * @method     ChildWorkType[]|ObjectCollection findByMilestoneLabel(string $milestone_label) Return ChildWorkType objects filtered by the milestone_label column
  * @method     ChildWorkType[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -328,8 +328,8 @@ abstract class WorkTypeQuery extends ModelCriteria
      *
      * Example usage:
      * <code>
-     * $query->filterByworkLabel('fooValue');   // WHERE work_label = 'fooValue'
-     * $query->filterByworkLabel('%fooValue%'); // WHERE work_label LIKE '%fooValue%'
+     * $query->filterByWorkLabel('fooValue');   // WHERE work_label = 'fooValue'
+     * $query->filterByWorkLabel('%fooValue%'); // WHERE work_label LIKE '%fooValue%'
      * </code>
      *
      * @param     string $workLabel The value to use as filter.
@@ -338,7 +338,7 @@ abstract class WorkTypeQuery extends ModelCriteria
      *
      * @return $this|ChildWorkTypeQuery The current query, for fluid interface
      */
-    public function filterByworkLabel($workLabel = null, $comparison = null)
+    public function filterByWorkLabel($workLabel = null, $comparison = null)
     {
         if (null === $comparison) {
             if (is_array($workLabel)) {
@@ -357,8 +357,8 @@ abstract class WorkTypeQuery extends ModelCriteria
      *
      * Example usage:
      * <code>
-     * $query->filterBymilestoneLabel('fooValue');   // WHERE milestone_label = 'fooValue'
-     * $query->filterBymilestoneLabel('%fooValue%'); // WHERE milestone_label LIKE '%fooValue%'
+     * $query->filterByMilestoneLabel('fooValue');   // WHERE milestone_label = 'fooValue'
+     * $query->filterByMilestoneLabel('%fooValue%'); // WHERE milestone_label LIKE '%fooValue%'
      * </code>
      *
      * @param     string $milestoneLabel The value to use as filter.
@@ -367,7 +367,7 @@ abstract class WorkTypeQuery extends ModelCriteria
      *
      * @return $this|ChildWorkTypeQuery The current query, for fluid interface
      */
-    public function filterBymilestoneLabel($milestoneLabel = null, $comparison = null)
+    public function filterByMilestoneLabel($milestoneLabel = null, $comparison = null)
     {
         if (null === $comparison) {
             if (is_array($milestoneLabel)) {
