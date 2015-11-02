@@ -40,8 +40,8 @@
     <table name="work_type" phpName="WorkType">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="255" required="true" />
-        <column name="work_label" type="varchar" size="255" required="true" phpName="workLabel" />
-        <column name="milestone_label" type="varchar" sixe="255" required="true" phpName="milestoneLabel" />
+        <column name="work_label" type="varchar" size="255" required="true"  />
+        <column name="milestone_label" type="varchar" sixe="255" required="true"  />
         <!-- foreign keys -->
     </table>
 
