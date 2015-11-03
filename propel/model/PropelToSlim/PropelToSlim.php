@@ -9,6 +9,7 @@ class PropelToSlim {
     private $apiBasePath = "/api/";
     private $modelNameSpace;
     private $schema;
+    private $exclusionList;
     /** @var ResponseObject\ResponseObjectInterface  $responseObject */
     private $responseObject;
 
@@ -17,6 +18,10 @@ class PropelToSlim {
         $this->pathToSchema = $pathToSchema;
         $this->loadSchema();
         $this->responseObject = new ResponseObject\JsonResponseObject();
+    }
+
+    public function setExclusions ($exclusionArray) {
+        $this->exclusionList = $exclusionArray;
     }
 
     public function loadSchema () {

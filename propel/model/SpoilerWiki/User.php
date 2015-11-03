@@ -16,5 +16,17 @@ use SpoilerWiki\Base\User as BaseUser;
  */
 class User extends BaseUser
 {
-
+    static function authenticate ($userName, $password) {
+        $passwordCypher = md5($password);
+        $user = UserQuery::create()->filterByUsername($userName)->findOne();
+        if($user) {
+            if($user->getPassword() == $passwordCypher) {
+                return $user;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }
