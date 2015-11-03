@@ -81,14 +81,23 @@ class PropelToSlim {
     private function _getRecord($table) {
         $app = $this->slimApp;
         return  function ($id) use ($app, $table) {
-
+            $queryObject = $this->_getQueryObject($table);
+            $result = $queryObject->findPK($id);
+            $this->responseObject->setStatus("success");
+            $this->responseObject->addField("item", $result->toArray());
+            $this->responseObject->renderOutput();
         };
     }
 
     private function _getRecordBy($table) {
         $app = $this->slimApp;
         return  function ($key,$value) use ($app, $table) {
-
+            $queryObject = $this->_getQueryObject($table);
+            $queryObject->filterBy($key, $value);
+            $results = $this->_processResults($queryObject->find());
+            $this->responseObject->setStatus("success");
+            $this->responseObject->addField("resultList", $results);
+            $this->responseObject->renderOutput();
         };
     }
 
