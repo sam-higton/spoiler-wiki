@@ -21,7 +21,9 @@ built with [Propel ORM](http://propelorm.org/) and [Slim](http://www.slimframewo
 
 ### updating the database
 
-If the schema has been modified since the last commit, run the following to preserve your data:
+If the schema has been modified since the last commit, run the following to preserve your data (note: this doesn't actually work yet):
 
 1. `vendor/bin/propel diff`
 2. `vendor/bin/propel migrate`
+
+You may also need to run `composer dump-autoload`, if the model structure has been changed
