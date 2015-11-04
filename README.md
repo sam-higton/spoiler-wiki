@@ -21,7 +21,7 @@ built with [Propel ORM](http://propelorm.org/) and [Slim](http://www.slimframewo
 
 ### updating the database
 
-If the schema has been modified since the last commit, run the following to preserve your data (note: this doesn't actually work yet (update: I've this sort of working now! You just have to pass the dsn to the diff command. It's not very convenient, but hey, it works!)):
+If the schema has been modified since the last commit, run the following to preserve your data (note: this doesn't actually work yet (update: I have this sort of working now! You just have to pass the dsn to the diff command. It's not very convenient, but hey, it works!)):
 
 1. `vendor/bin/propel diff --connection='<insert fully qualified dsn here>'`
 2. `vendor/bin/propel migrate`
