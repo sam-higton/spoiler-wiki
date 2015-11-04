@@ -19,8 +19,9 @@ built with [Propel ORM](http://propelorm.org/) and [Slim](http://www.slimframewo
 7. update with your database connections. 
 8. `spoilerwiki-local` is the connection that will be used by the application on the server, and hence will probably be pointing to localhost.
 9. `spoilerwiki-remote` is the connection that will be used when you run propel from the command line. As this will be running on the host machine, the connection will need to be pointed at hte IP of your vagrant box (192.168.10.33, if you're using the default settings. In fact, if you're using the default settings, you can just use the connection settings that are already in the example. I know, the password is "root", but it's only running locally. Don't be so quick to judge.)
-7. `vendor/bin/propel sql:build --overwrite`
-8. `vendor/bin/propel sql:insert`
+10. `vendor/bin/propel config:convert`
+11. `vendor/bin/propel sql:build --overwrite`
+12. `vendor/bin/propel sql:insert`
 
 ### updating the database
 
