@@ -20,6 +20,11 @@ class User extends BaseUser
     static function authenticate ($userName, $password) {
         $passwordCypher = md5($password);
         $user = UserQuery::create()->filterByUsername($userName)->findOne();
+
+        if(!$user) {
+            $user = UserQuery::create()->filterByEmail($userName)->findOne();
+        }
+
         if($user) {
             if($user->getPassword() == $passwordCypher) {
                 return $user;
