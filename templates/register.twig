@@ -4,20 +4,20 @@
 {% block content %}
     <div class="row">
         <h1>Create an account</h1>
-        <form role="form">
+        <form role="form" method="post">
             <div class="col-lg-8">
                 <div class="well well-sm"><strong><span class="glyphicon glyphicon-asterisk"></span>Required Field</strong></div>
                 <div class="form-group">
                     <label for="InputName">Enter User Name</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" name="InputName" id="InputName" placeholder="Enter Name" required>
+                        <input type="text" class="form-control" name="userName" id="userName" placeholder="Enter Name" required>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-asterisk"></span></span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="InputEmail">Enter Email</label>
-                    <div class="input-group">
-                        <input type="email" class="form-control" id="InputEmailFirst" name="InputEmail" placeholder="Enter Email" >
+                    <label for="emailAddress">Enter Email</label>
+                    <div class="input">
+                        <input type="email" class="form-control" id="emailAddress" name="emailAddress" placeholder="Enter Email" >
 
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                 <div class="well">
                     <p>You need to make an account to submit content to the wiki.</p>
                     <p>Your account is entirely anonymous, and the email address is optional.</p>
-                    <p>If you do choose to provide an email address, you can be safe in the knowledge that we will only use it to send notifications releveant to your account. There wil lbe no marketing emails, and we will never share it with any third parties.</p>
+                    <p>If you do choose to provide an email address, you can be safe in the knowledge that we will only use it to send notifications releveant to your account. There will lbe no marketing emails, and we will never share it with any third parties.</p>
                 </div>
             </div>
         </form>

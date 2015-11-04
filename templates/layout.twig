@@ -33,27 +33,44 @@
                     <span class="icon-bar"></span>
                 </button>
                 <span class="navbar-brand" >Spoiler Wiki</span>
-                <div class="wiki">
-                    <div class="canon">Lord of the Rings </div>
-                    <div class="position">Two Towers - Chapter II</div>
-                </div>
+                {% block headingWidget %}
+                    <div class="wiki">
+                        <div class="canon">Lord of the Rings </div>
+                        <div class="position">Two Towers - Chapter II</div>
+                    </div>
+                {% endblock %}
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li class=""><a href="#" data-toggle="modal" data-target="#progress-modal">Update progress</a></li>
-                    <li class=""><a href="#">Select another series</a></li>
-                    {#<li class="dropdown">#}
-                        {#<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>#}
-                        {#<ul class="dropdown-menu">#}
-                            {#<li><a href="/">home</a></li>#}
+                {% block navLeft %}
+                    <ul class="nav navbar-nav">
+                        <li class=""><a href="#" data-toggle="modal" data-target="#progress-modal">Update progress</a></li>
+                        <li class=""><a href="#">Select another series</a></li>
+                        {#<li class="dropdown">#}
+                            {#<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>#}
+                            {#<ul class="dropdown-menu">#}
+                                {#<li><a href="/">home</a></li>#}
 
-                        {#</ul>#}
-                    {#</li>#}
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
+                            {#</ul>#}
+                        {#</li>#}
+                    </ul>
+                {% endblock %}
+                {% block navRight %}
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user %}
+                            <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ user.Username }}<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/contribute">Contribute Hub</a></li>
+                                <li><a href="/logout">logout</a></li>
 
-                    <li class="active"><a href="/contribute">Contribute! <span class="sr-only">(current)</span></a></li>
-                </ul>
+                            </ul>
+                            </li>
+                        {% else %}
+                            <li class="active"><a href="/contribute">Contribute! <span class="sr-only">(current)</span></a></li>
+                        {% endif %}
+
+                    </ul>
+                {% endblock %}
             </div><!--/.nav-collapse -->
         </div>
     </nav>

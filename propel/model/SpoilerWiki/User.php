@@ -3,6 +3,7 @@
 namespace SpoilerWiki;
 
 use SpoilerWiki\Base\User as BaseUser;
+use SpoilerWiki\Base\UserQuery;
 
 /**
  * Skeleton subclass for representing a row from the 'user' table.
@@ -28,5 +29,18 @@ class User extends BaseUser
         } else {
             return false;
         }
+    }
+
+    static function userNameExists ($userName) {
+        return (UserQuery::create()->filterByUsername($userName)->count() > 0);
+    }
+
+    static function emailExists ($email) {
+        return (UserQuery::create()->filterByEmail($email)->count() > 0);
+    }
+
+    public function setPassword ($password) {
+        $password = md5($password);
+        return parent::setPassword($password);
     }
 }
