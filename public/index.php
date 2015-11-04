@@ -40,7 +40,7 @@ $app->map('/login', function () use ($app) {
 })->via('POST','GET');
 
 $app->map('/register', function () use ($app) {
-
+    $app->view()->display('register.twig', array());
 })->via('POST','GET');
 
 $propelApi = new \PropelToSlim\PropelToSlim($app,'../schema.xml');
