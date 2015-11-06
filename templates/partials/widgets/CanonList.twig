@@ -1,4 +1,19 @@
 <div class="col-md-4">
-    <h3>canons</h3>
-    <p>canon: {{ viewData.foo }}</p>
+    <div class="panel panel-default">
+        <div class="panel-heading">Canons</div>
+        <div class="panel-body">
+            {% if viewData.canonList|length > 0 %}
+                <ul class="list-group">
+                    {% for canon in viewData.canonList %}
+                        <li class="list-group-item">{{ canon.Name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>There aren't arny canons yet</p>
+            {% endif %}
+            <div class="actions right">
+                <button class="btn btn-success ">Add new canon</button>
+            </div>
+        </div>
+    </div>
 </div>
