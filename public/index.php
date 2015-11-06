@@ -52,7 +52,8 @@ $app->get('/topic/:id', function ($topicId) use ($app) {
 $app->get('/contribute',$checkAuth(), function () use ($app) {
     $app->view()->display('contribute-home.twig', array(
         "modules" => array (
-            \SpoilerWiki\Widget\CanonList::create()->view()
+            \SpoilerWiki\Widget\CanonList::create()->view(),
+            \SpoilerWiki\Widget\ArtistList::create()->view()
         )
     ));
 });
