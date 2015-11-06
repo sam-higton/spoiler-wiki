@@ -50,7 +50,11 @@ $app->get('/topic/:id', function ($topicId) use ($app) {
 });
 
 $app->get('/contribute',$checkAuth(), function () use ($app) {
-    $app->view()->display('contribute-home.twig', array());
+    $app->view()->display('contribute-home.twig', array(
+        "modules" => array (
+            \SpoilerWiki\Widget\CanonList::create()->view()
+        )
+    ));
 });
 
 $app->get('/logout', function () use ($app) {
@@ -125,7 +129,7 @@ $app->map('/register', function () use ($app) {
 $propelApi = new \PropelToSlim\PropelToSlim($app,'../schema.xml');
 $propelApi->generateRoutes();
 
-//$artist = new \SpoilerWiki\ArtistQuery();
+$artist = new \SpoilerWiki\ArtistQuery();
 //$artist->filterBy()
 
 $app->run();

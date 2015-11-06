@@ -5,4 +5,9 @@
 {% endblock %}
 {% block content %}
     <h1>Contributor's Hub</h1>
+    <div class="row">
+        {% for module in modules %}
+            {% include module.templatePath with {"viewData" : module.viewData} %}
+        {% endfor %}
+    </div>
 {% endblock %}
