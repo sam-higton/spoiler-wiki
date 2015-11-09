@@ -4,9 +4,11 @@ namespace PropelForm;
 class PropelForm {
     protected $namespace = "";
     protected $objectName = "";
+    protected $object;
     protected $formFields = array();
     protected $tableMap;
     protected $customTemplates = array();
+    protected $input = array();
     protected $templates = array (
         "VARCHAR" => "partials/formInputs/textField.twig",
         "LONGVARCHAR" => "partials/formInputs/textArea.twig",
@@ -22,7 +24,7 @@ class PropelForm {
         if($templates) {
             $this->templates = $templates;
         }
-        $this->getTableMap();
+        $this->loadTableMap();
         $this->generateFormFields();
     }
 
@@ -30,37 +32,8 @@ class PropelForm {
         $columns = $this->tableMap->getColumns();
 
         foreach($columns as $column) {
-            $this->formFields = array ();
-            if(array_key_exists($column->getName(),$this->customTemplates)) {
-                $template = $this->customTemplates[$column->getName()];
-            } else {
-                $template = $this->templates[$column->getType()];
-            }
-            $fieldArray = array (
-                "type" => $column->getType(),
-                "name"=> $column->getName(),
-                "template" => $template
-            );
-
-            if($column->isForeignKey()) {
-                $relation = $column->getRelation();
-                $foreignTable = $relation->getForeignTable();
-                $foreignTable->getPhpName();
-                $queryObjectClassName = $this->namespace . "\\" . $foreignTable->getPhpName() . "Query";
-                $relatedObjects = $queryObjectClassName::create()->find();
-                $relatedOptions = array();
-                foreach($relatedObjects as $object) {
-                    $relatedOptions[] = array (
-                        "value" => $object->getId(),
-                        "label" => $object->getName()
-                    );
-                }
-                $fieldArray['relation'] = array (
-                    "name" => $foreignTable->getName(),
-                    "options" => $relatedOptions
-                );
-            }
-            $this->formFields[] = $fieldArray;
+            $newField = new FormInput($this->namespace, $column);
+            $formFields[$column->getName()] = $newField;
         }
     }
 
@@ -72,7 +45,35 @@ class PropelForm {
         $this->customTemplates[$fieldName] = $templatePath;
     }
 
-    private function getTableMap () {
+    public function prePopulate ($input) {
+        //todo: populate form with values from array
+    }
+
+    public function validate () {
+        //todo: check against input validators
+    }
+
+    public function save () {
+        //todo: save object and return $id
+    }
+
+    public function load ($id) {
+        //todo: load object from database
+    }
+
+    public function getField($key) {
+
+    }
+
+    public function setField($key, $input) {
+
+    }
+
+    private function loadObject () {
+
+    }
+
+    private function loadTableMap () {
         $mapString = $this->namespace . "\\Map\\" . ucwords($this->objectName) . "TableMap";
         $this->tableMap = $mapString::getTableMap();
         return $this;
