@@ -6,6 +6,7 @@ class PropelForm {
     protected $objectName = "";
     protected $formFields = array();
     protected $tableMap;
+    protected $customTemplates = array();
     protected $templates = array (
         "VARCHAR" => "partials/formInputs/textField.twig",
         "LONGVARCHAR" => "partials/formInputs/textArea.twig",
@@ -24,12 +25,18 @@ class PropelForm {
 
     public function generateFormFields () {
         $columns = $this->tableMap->getColumns();
-        $this->formFields = array ();
+
         foreach($columns as $column) {
+            $this->formFields = array ();
+            if(array_key_exists($column->getName(),$this->customTemplates)) {
+                $template = $this->customTemplates[$column->getName()];
+            } else {
+                $template = $this->templates[$column->getType()];
+            }
             $fieldArray = array (
                 "type" => $column->getType(),
                 "name"=> $column->getName(),
-                "template" => $this->templates[$column->getType()]
+                "template" => $template
             );
 
             if($column->isForeignKey()) {
@@ -56,6 +63,10 @@ class PropelForm {
 
     public function getFormFields () {
         return $this->formFields;
+    }
+
+    public function setTemplate ($fieldName, $templatePath) {
+        $this->customTemplates[$fieldName] = $templatePath;
     }
 
     private function getTableMap () {
