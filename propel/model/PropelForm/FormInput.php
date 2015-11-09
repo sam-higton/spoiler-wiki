@@ -14,8 +14,10 @@ class FormInput {
 
     public function __construct ($namespace, $column) {
         $this->column = $column;
+        $this->namespace = $namespace;
         $this->name = $column->getName();
         $this->type = $column->getType();
+        $this->loadRelatedOptions();
         return $this;
     }
 
@@ -34,6 +36,18 @@ class FormInput {
         return $this;
     }
 
+    function getName () {
+        return $this->name;
+    }
+
+    function getType () {
+        return $this->type;
+    }
+
+    function getValue () {
+        return $this->value;
+    }
+
     public function toArray () {
         return array (
             "name" => $this->name,
@@ -43,6 +57,10 @@ class FormInput {
             "isValid" => $this->isValid(),
             "relatedOptions" => $this->relatedOptions
         );
+    }
+
+    public function hasRelations () {
+        return (count($this->relatedOptions) > 0);
     }
 
     public function loadRelatedOptions () {

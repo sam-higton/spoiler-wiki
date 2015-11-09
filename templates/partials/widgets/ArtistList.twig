@@ -5,14 +5,14 @@
             {% if viewData.artistList|length > 0 %}
                 <ul class="list-group">
                     {% for Artist in viewData.artistList %}
-                        <li class="list-group-item">{{ artist.Name }}</li>
+                        <li class="list-group-item"> {{ Artist.Name }}</li>
                     {% endfor %}
                 </ul>
             {% else %}
                 <p>There aren't any artists yet</p>
             {% endif %}
             <div class="actions right">
-                <button class="btn btn-success ">Add new artist</button>
+                <a href="/contribute/create/artist" class="btn btn-success ">Add new artist</a>
             </div>
         </div>
     </div>

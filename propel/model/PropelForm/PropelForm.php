@@ -25,6 +25,7 @@ class PropelForm {
             $this->templates = $templates;
         }
         $this->loadTableMap();
+        $this->loadObject();
         $this->generateFormFields();
     }
 
@@ -33,7 +34,12 @@ class PropelForm {
 
         foreach($columns as $column) {
             $newField = new FormInput($this->namespace, $column);
-            $formFields[$column->getName()] = $newField;
+            if($newField->hasRelations()) {
+                $newField->setTemplate('partials/formInputs/relationalSelect.twig');
+            } else {
+                $newField->setTemplate($this->templates[$newField->getType()]);
+            }
+            $this->setField($newField);
         }
     }
 
@@ -41,12 +47,24 @@ class PropelForm {
         return $this->formFields;
     }
 
-    public function setTemplate ($fieldName, $templatePath) {
-        $this->customTemplates[$fieldName] = $templatePath;
+    public function populate ($inputArray) {
+        //todo: populate form with values from array
+        /** @var FormInput $field */
+        foreach($this->formFields as $field) {
+            if($field->getName() !== "id") {
+                $field->setValue($inputArray[$field->getName()]);
+            }
+        }
     }
 
-    public function prePopulate ($input) {
-        //todo: populate form with values from array
+    public function getInputs () {
+        $inputArray = array ();
+        /** @var FormInput $field */
+        foreach($this->formFields as $field) {
+            $inputArray[ucwords($field->getName())] = $field->getValue();
+
+        }
+        return $inputArray;
     }
 
     public function validate () {
@@ -55,6 +73,9 @@ class PropelForm {
 
     public function save () {
         //todo: save object and return $id
+        $this->object->fromArray($this->getInputs());
+        $this->object->save();
+        return $this->object->getId();
     }
 
     public function load ($id) {
@@ -62,15 +83,26 @@ class PropelForm {
     }
 
     public function getField($key) {
-
+        return $this->formFields[$key];
     }
 
-    public function setField($key, $input) {
+    public function setField(FormInput $input) {
+        $fieldName = $input->getName();
+        $this->formFields[$fieldName] = $input;
+    }
 
+    public function toArray () {
+        $formattedArray = array();
+        /** @var FormInput $field */
+        foreach($this->formFields as $field) {
+            $formattedArray[] = $field->toArray();
+        }
+        return $formattedArray;
     }
 
     private function loadObject () {
-
+        $classString = $this->namespace . "\\" . ucwords($this->objectName);
+        $this->object = new $classString();
     }
 
     private function loadTableMap () {
