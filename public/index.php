@@ -58,6 +58,50 @@ $app->get('/contribute',$checkAuth(), function () use ($app) {
     ));
 });
 
+$app->map('/contribute/create/:model',$checkAuth(), function ($model) use ($app) {
+    $mapString = "SpoilerWiki\\Map\\" . ucwords($model) . "TableMap";
+    $map = $mapString::getTableMap();
+    $mapColumns = $map->getColumns();
+    $formFields = array ();
+    $inputTemplateMap = array (
+        "VARCHAR" => "partials/formInputs/textField.twig",
+        "LONGVARCHAR" => "partials/formInputs/textArea.twig",
+        "INTEGER" => "partials/formInputs/numberField.twig"
+    );
+    foreach($mapColumns as $column) {
+        $fieldArray = array (
+            "type" => $column->getType(),
+            "name"=> $column->getName(),
+            "template" => $inputTemplateMap[$column->getType()]
+        );
+
+        if($column->isForeignKey()) {
+            $relation = $column->getRelation();
+            $foreignTable = $relation->getForeignTable();
+            $foreignTable->getPhpName();
+            $queryObjectClassName = "SpoilerWiki\\" . $foreignTable->getPhpName() . "Query";
+            $relatedObjects = $queryObjectClassName::create()->find();
+            $relatedOptions = array();
+            foreach($relatedObjects as $object) {
+                $relatedOptions[] = array (
+                    "value" => $object->getId(),
+                    "label" => $object->getName()
+                );
+            }
+            $fieldArray['relation'] = array (
+                "name" => $foreignTable->getName(),
+                "options" => $relatedOptions
+            );
+        }
+
+        $formFields[] = $fieldArray;
+    }
+    $app->view()->display('contribute-create.twig', array (
+        'modelName' => $model,
+        'fieldList' => $formFields
+    ));
+})->via('GET', 'POST');
+
 $app->get('/logout', function () use ($app) {
     unset($_SESSION['user_id']);
     $app->redirect('/');
@@ -125,7 +169,6 @@ $app->map('/register', function () use ($app) {
         "errors" => $errors
     ));
 })->via('POST','GET');
-
 
 $propelApi = new \PropelToSlim\PropelToSlim($app,'../schema.xml');
 $propelApi->generateRoutes();

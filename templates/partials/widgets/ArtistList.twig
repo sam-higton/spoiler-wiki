@@ -2,7 +2,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">Artists</div>
         <div class="panel-body">
-            {% if viewData.canonList|length > 0 %}
+            {% if viewData.artistList|length > 0 %}
                 <ul class="list-group">
                     {% for Artist in viewData.artistList %}
                         <li class="list-group-item">{{ artist.Name }}</li>
