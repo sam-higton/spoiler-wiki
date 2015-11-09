@@ -13,6 +13,9 @@ class PropelForm {
         "INTEGER" => "partials/formInputs/numberField.twig"
     );
 
+    //todo: add form validation
+    //todo: add form response handling
+
     public function __construct ($namespace, $objectName, $templates = false) {
         $this->namespace = $namespace;
         $this->objectName = $objectName;
