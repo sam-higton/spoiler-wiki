@@ -59,46 +59,10 @@ $app->get('/contribute',$checkAuth(), function () use ($app) {
 });
 
 $app->map('/contribute/create/:model',$checkAuth(), function ($model) use ($app) {
-    $mapString = "SpoilerWiki\\Map\\" . ucwords($model) . "TableMap";
-    $map = $mapString::getTableMap();
-    $mapColumns = $map->getColumns();
-    $formFields = array ();
-    $inputTemplateMap = array (
-        "VARCHAR" => "partials/formInputs/textField.twig",
-        "LONGVARCHAR" => "partials/formInputs/textArea.twig",
-        "INTEGER" => "partials/formInputs/numberField.twig"
-    );
-    foreach($mapColumns as $column) {
-        $fieldArray = array (
-            "type" => $column->getType(),
-            "name"=> $column->getName(),
-            "template" => $inputTemplateMap[$column->getType()]
-        );
-
-        if($column->isForeignKey()) {
-            $relation = $column->getRelation();
-            $foreignTable = $relation->getForeignTable();
-            $foreignTable->getPhpName();
-            $queryObjectClassName = "SpoilerWiki\\" . $foreignTable->getPhpName() . "Query";
-            $relatedObjects = $queryObjectClassName::create()->find();
-            $relatedOptions = array();
-            foreach($relatedObjects as $object) {
-                $relatedOptions[] = array (
-                    "value" => $object->getId(),
-                    "label" => $object->getName()
-                );
-            }
-            $fieldArray['relation'] = array (
-                "name" => $foreignTable->getName(),
-                "options" => $relatedOptions
-            );
-        }
-
-        $formFields[] = $fieldArray;
-    }
+    $createForm = new \PropelForm\PropelForm("SpoilerWiki", $model);
     $app->view()->display('contribute-create.twig', array (
         'modelName' => $model,
-        'fieldList' => $formFields
+        'fieldList' => $createForm->getFormFields()
     ));
 })->via('GET', 'POST');
 

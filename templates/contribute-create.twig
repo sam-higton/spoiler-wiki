@@ -9,5 +9,6 @@
         {% for field in fieldList %}
                 {% include field.template with {"field" : field } %}
         {% endfor %}
+        <input type="submit" name="submit" id="submit" value="Submit" class="btn btn-info pull-right">
     </form>
 {% endblock %}
