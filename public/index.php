@@ -60,9 +60,17 @@ $app->get('/contribute',$checkAuth(), function () use ($app) {
 
 $app->map('/contribute/create/:model',$checkAuth(), function ($model) use ($app) {
     $createForm = new \PropelForm\PropelForm("SpoilerWiki", $model);
+    $createForm->getField("id")->setTemplate('partials/formInputs/id.twig');
+    if($app->request->isPost()) {
+        $formResponse = $app->request->post();
+        $createForm->populate($formResponse);
+        $createForm->save();
+        $app->redirect('/contribute');
+    }
+
     $app->view()->display('contribute-create.twig', array (
         'modelName' => $model,
-        'fieldList' => $createForm->getFormFields()
+        'fieldList' => $createForm->toArray()
     ));
 })->via('GET', 'POST');
 
@@ -70,6 +78,24 @@ $app->get('/logout', function () use ($app) {
     unset($_SESSION['user_id']);
     $app->redirect('/');
 });
+
+$app->map('/contribute/edit/:model/:id', $checkAuth(), function ($model, $id) use ($app) {
+
+    $editForm = new \PropelForm\PropelForm("SpoilerWiki", $model);
+    $editForm->getField("id")->setTemplate('partials/formInputs/id.twig');
+    $editForm->load($id);
+    if($app->request->isPost()) {
+        $formResponse = $app->request->post();
+        $editForm->populate($formResponse);
+        $editForm->save();
+        $app->redirect('/contribute');
+    }
+
+    $app->view()->display('contribute-edit.twig', array (
+        'modelName' => $model,
+        'fieldList' => $editForm->toArray()
+    ));
+})->via('POST','GET');
 
 $app->map('/login', function () use ($app) {
     $error = false;

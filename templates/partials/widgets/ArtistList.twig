@@ -5,7 +5,13 @@
             {% if viewData.artistList|length > 0 %}
                 <ul class="list-group">
                     {% for Artist in viewData.artistList %}
-                        <li class="list-group-item"> {{ Artist.Name }}</li>
+                        <li class="list-group-item">
+                            <h4 class="list-group-item-heading">{{ Artist.Name }}</h4>
+                            <div class="list-group-item-text btn-group btn-group-xs">
+                                <a class="btn btn-default" href="/contribute/edit/artist/{{ Artist.Id }}">edit</a>
+                                <a class="btn btn-danger" href="/contribute/delete/artist/{{ Artist.Id }}">delete</a>
+                            </div>
+                        </li>
                     {% endfor %}
                 </ul>
             {% else %}

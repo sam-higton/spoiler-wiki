@@ -5,6 +5,7 @@ class PropelForm {
     protected $namespace = "";
     protected $objectName = "";
     protected $object;
+    protected $queryObject;
     protected $formFields = array();
     protected $tableMap;
     protected $customTemplates = array();
@@ -48,13 +49,18 @@ class PropelForm {
     }
 
     public function populate ($inputArray) {
+        $inputArray = $this->formatArray($inputArray);
         //todo: populate form with values from array
         /** @var FormInput $field */
         foreach($this->formFields as $field) {
-            if($field->getName() !== "id") {
-                $field->setValue($inputArray[$field->getName()]);
+            if(isset($inputArray[ucwords($field->getName())])) {
+                $field->setValue($inputArray[ucwords($field->getName())]);
             }
         }
+    }
+
+    public function populateFromObject ($object) {
+        $this->populate($object->toArray());
     }
 
     public function getInputs () {
@@ -80,6 +86,14 @@ class PropelForm {
 
     public function load ($id) {
         //todo: load object from database
+        $newObject = $this->queryObject->findPK($id);
+        if(is_null($newObject)) {
+            return false;
+        } else {
+            $this->object = $newObject;
+            $this->populateFromObject($this->object);
+        }
+
     }
 
     public function getField($key) {
@@ -91,6 +105,14 @@ class PropelForm {
         $this->formFields[$fieldName] = $input;
     }
 
+    public function formatArray ($array) {
+        $newArray = array();
+        foreach($array as $key => $value) {
+            $newArray[ucwords($key)] = $value;
+        }
+        return $newArray;
+    }
+
     public function toArray () {
         $formattedArray = array();
         /** @var FormInput $field */
@@ -100,9 +122,13 @@ class PropelForm {
         return $formattedArray;
     }
 
-    private function loadObject () {
+    private function loadObject ($loadQuery = true) {
         $classString = $this->namespace . "\\" . ucwords($this->objectName);
+        $queryString = $this->namespace . "\\" . ucwords($this->objectName) . "Query";
         $this->object = new $classString();
+        if($loadQuery) {
+            $this->queryObject = new $queryString();
+        }
     }
 
     private function loadTableMap () {
