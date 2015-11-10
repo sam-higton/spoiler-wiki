@@ -242,6 +242,32 @@ CREATE TABLE `role`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- assigned_role_global
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `assigned_role_global`;
+
+CREATE TABLE `assigned_role_global`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `role_id` INTEGER NOT NULL,
+    `assigned_by` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `assigned_role_global_fi_29554a` (`user_id`),
+    INDEX `assigned_role_global_fi_5e026c` (`assigned_by`),
+    CONSTRAINT `assigned_role_global_fk_29554a`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `user` (`id`),
+    CONSTRAINT `assigned_role_global_fk_5e026c`
+        FOREIGN KEY (`assigned_by`)
+        REFERENCES `user` (`id`),
+    CONSTRAINT `assigned_role_global_fk_213711`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `role` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- assigned_role
 -- ---------------------------------------------------------------------
 

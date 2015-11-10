@@ -131,6 +131,22 @@
         <column name="name" type="varchar" size="255" required="true" />
         <column name="description" type="varchar" size="255" required="false" />
     </table>
+    <table name="assigned_role_global" phpName="AssignedRoleGlobal">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="user_id" type="integer" required="true"/>
+        <column name="role_id" type="integer" required="true"/>
+        <column name="assigned_by" type="integer" required="true"/>
+        <!-- foreign keys -->
+        <foreign-key foreignTable="user" phpName="user">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="user" phpName="assignedBy">
+            <reference local="assigned_by" foreign="id" />
+        </foreign-key>
+        <foreign-key foreignTable="role" phpName="role">
+            <reference local="user_id" foreign="id" />
+        </foreign-key>
+    </table>
     <table name="assigned_role" phpName="AssignedRole">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="user_id" type="integer" required="true"/>

@@ -17,6 +17,8 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use SpoilerWiki\AssignedRole as ChildAssignedRole;
+use SpoilerWiki\AssignedRoleGlobal as ChildAssignedRoleGlobal;
+use SpoilerWiki\AssignedRoleGlobalQuery as ChildAssignedRoleGlobalQuery;
 use SpoilerWiki\AssignedRoleQuery as ChildAssignedRoleQuery;
 use SpoilerWiki\Role as ChildRole;
 use SpoilerWiki\RoleQuery as ChildRoleQuery;
@@ -85,6 +87,12 @@ abstract class Role implements ActiveRecordInterface
     protected $description;
 
     /**
+     * @var        ObjectCollection|ChildAssignedRoleGlobal[] Collection to store aggregation of ChildAssignedRoleGlobal objects.
+     */
+    protected $collAssignedRoleGlobals;
+    protected $collAssignedRoleGlobalsPartial;
+
+    /**
      * @var        ObjectCollection|ChildAssignedRole[] Collection to store aggregation of ChildAssignedRole objects.
      */
     protected $collAssignedRoles;
@@ -97,6 +105,12 @@ abstract class Role implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildAssignedRoleGlobal[]
+     */
+    protected $assignedRoleGlobalsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -529,6 +543,8 @@ abstract class Role implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collAssignedRoleGlobals = null;
+
             $this->collAssignedRoles = null;
 
         } // if (deep)
@@ -639,6 +655,23 @@ abstract class Role implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->assignedRoleGlobalsScheduledForDeletion !== null) {
+                if (!$this->assignedRoleGlobalsScheduledForDeletion->isEmpty()) {
+                    \SpoilerWiki\AssignedRoleGlobalQuery::create()
+                        ->filterByPrimaryKeys($this->assignedRoleGlobalsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->assignedRoleGlobalsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAssignedRoleGlobals !== null) {
+                foreach ($this->collAssignedRoleGlobals as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->assignedRolesScheduledForDeletion !== null) {
@@ -824,6 +857,21 @@ abstract class Role implements ActiveRecordInterface
         }
         
         if ($includeForeignObjects) {
+            if (null !== $this->collAssignedRoleGlobals) {
+                
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'assignedRoleGlobals';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'assigned_role_globals';
+                        break;
+                    default:
+                        $key = 'AssignedRoleGlobals';
+                }
+        
+                $result[$key] = $this->collAssignedRoleGlobals->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collAssignedRoles) {
                 
                 switch ($keyType) {
@@ -1061,6 +1109,12 @@ abstract class Role implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getAssignedRoleGlobals() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAssignedRoleGlobal($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getAssignedRoles() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addAssignedRole($relObj->copy($deepCopy));
@@ -1108,9 +1162,280 @@ abstract class Role implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('AssignedRoleGlobal' == $relationName) {
+            return $this->initAssignedRoleGlobals();
+        }
         if ('AssignedRole' == $relationName) {
             return $this->initAssignedRoles();
         }
+    }
+
+    /**
+     * Clears out the collAssignedRoleGlobals collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAssignedRoleGlobals()
+     */
+    public function clearAssignedRoleGlobals()
+    {
+        $this->collAssignedRoleGlobals = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collAssignedRoleGlobals collection loaded partially.
+     */
+    public function resetPartialAssignedRoleGlobals($v = true)
+    {
+        $this->collAssignedRoleGlobalsPartial = $v;
+    }
+
+    /**
+     * Initializes the collAssignedRoleGlobals collection.
+     *
+     * By default this just sets the collAssignedRoleGlobals collection to an empty array (like clearcollAssignedRoleGlobals());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAssignedRoleGlobals($overrideExisting = true)
+    {
+        if (null !== $this->collAssignedRoleGlobals && !$overrideExisting) {
+            return;
+        }
+        $this->collAssignedRoleGlobals = new ObjectCollection();
+        $this->collAssignedRoleGlobals->setModel('\SpoilerWiki\AssignedRoleGlobal');
+    }
+
+    /**
+     * Gets an array of ChildAssignedRoleGlobal objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildRole is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildAssignedRoleGlobal[] List of ChildAssignedRoleGlobal objects
+     * @throws PropelException
+     */
+    public function getAssignedRoleGlobals(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAssignedRoleGlobalsPartial && !$this->isNew();
+        if (null === $this->collAssignedRoleGlobals || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAssignedRoleGlobals) {
+                // return empty collection
+                $this->initAssignedRoleGlobals();
+            } else {
+                $collAssignedRoleGlobals = ChildAssignedRoleGlobalQuery::create(null, $criteria)
+                    ->filterByrole($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collAssignedRoleGlobalsPartial && count($collAssignedRoleGlobals)) {
+                        $this->initAssignedRoleGlobals(false);
+
+                        foreach ($collAssignedRoleGlobals as $obj) {
+                            if (false == $this->collAssignedRoleGlobals->contains($obj)) {
+                                $this->collAssignedRoleGlobals->append($obj);
+                            }
+                        }
+
+                        $this->collAssignedRoleGlobalsPartial = true;
+                    }
+
+                    return $collAssignedRoleGlobals;
+                }
+
+                if ($partial && $this->collAssignedRoleGlobals) {
+                    foreach ($this->collAssignedRoleGlobals as $obj) {
+                        if ($obj->isNew()) {
+                            $collAssignedRoleGlobals[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAssignedRoleGlobals = $collAssignedRoleGlobals;
+                $this->collAssignedRoleGlobalsPartial = false;
+            }
+        }
+
+        return $this->collAssignedRoleGlobals;
+    }
+
+    /**
+     * Sets a collection of ChildAssignedRoleGlobal objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $assignedRoleGlobals A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildRole The current object (for fluent API support)
+     */
+    public function setAssignedRoleGlobals(Collection $assignedRoleGlobals, ConnectionInterface $con = null)
+    {
+        /** @var ChildAssignedRoleGlobal[] $assignedRoleGlobalsToDelete */
+        $assignedRoleGlobalsToDelete = $this->getAssignedRoleGlobals(new Criteria(), $con)->diff($assignedRoleGlobals);
+
+        
+        $this->assignedRoleGlobalsScheduledForDeletion = $assignedRoleGlobalsToDelete;
+
+        foreach ($assignedRoleGlobalsToDelete as $assignedRoleGlobalRemoved) {
+            $assignedRoleGlobalRemoved->setrole(null);
+        }
+
+        $this->collAssignedRoleGlobals = null;
+        foreach ($assignedRoleGlobals as $assignedRoleGlobal) {
+            $this->addAssignedRoleGlobal($assignedRoleGlobal);
+        }
+
+        $this->collAssignedRoleGlobals = $assignedRoleGlobals;
+        $this->collAssignedRoleGlobalsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related AssignedRoleGlobal objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AssignedRoleGlobal objects.
+     * @throws PropelException
+     */
+    public function countAssignedRoleGlobals(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAssignedRoleGlobalsPartial && !$this->isNew();
+        if (null === $this->collAssignedRoleGlobals || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAssignedRoleGlobals) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getAssignedRoleGlobals());
+            }
+
+            $query = ChildAssignedRoleGlobalQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByrole($this)
+                ->count($con);
+        }
+
+        return count($this->collAssignedRoleGlobals);
+    }
+
+    /**
+     * Method called to associate a ChildAssignedRoleGlobal object to this object
+     * through the ChildAssignedRoleGlobal foreign key attribute.
+     *
+     * @param  ChildAssignedRoleGlobal $l ChildAssignedRoleGlobal
+     * @return $this|\SpoilerWiki\Role The current object (for fluent API support)
+     */
+    public function addAssignedRoleGlobal(ChildAssignedRoleGlobal $l)
+    {
+        if ($this->collAssignedRoleGlobals === null) {
+            $this->initAssignedRoleGlobals();
+            $this->collAssignedRoleGlobalsPartial = true;
+        }
+
+        if (!$this->collAssignedRoleGlobals->contains($l)) {
+            $this->doAddAssignedRoleGlobal($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildAssignedRoleGlobal $assignedRoleGlobal The ChildAssignedRoleGlobal object to add.
+     */
+    protected function doAddAssignedRoleGlobal(ChildAssignedRoleGlobal $assignedRoleGlobal)
+    {
+        $this->collAssignedRoleGlobals[]= $assignedRoleGlobal;
+        $assignedRoleGlobal->setrole($this);
+    }
+
+    /**
+     * @param  ChildAssignedRoleGlobal $assignedRoleGlobal The ChildAssignedRoleGlobal object to remove.
+     * @return $this|ChildRole The current object (for fluent API support)
+     */
+    public function removeAssignedRoleGlobal(ChildAssignedRoleGlobal $assignedRoleGlobal)
+    {
+        if ($this->getAssignedRoleGlobals()->contains($assignedRoleGlobal)) {
+            $pos = $this->collAssignedRoleGlobals->search($assignedRoleGlobal);
+            $this->collAssignedRoleGlobals->remove($pos);
+            if (null === $this->assignedRoleGlobalsScheduledForDeletion) {
+                $this->assignedRoleGlobalsScheduledForDeletion = clone $this->collAssignedRoleGlobals;
+                $this->assignedRoleGlobalsScheduledForDeletion->clear();
+            }
+            $this->assignedRoleGlobalsScheduledForDeletion[]= clone $assignedRoleGlobal;
+            $assignedRoleGlobal->setrole(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Role is new, it will return
+     * an empty collection; or if this Role has previously
+     * been saved, it will retrieve related AssignedRoleGlobals from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Role.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildAssignedRoleGlobal[] List of ChildAssignedRoleGlobal objects
+     */
+    public function getAssignedRoleGlobalsJoinuser(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAssignedRoleGlobalQuery::create(null, $criteria);
+        $query->joinWith('user', $joinBehavior);
+
+        return $this->getAssignedRoleGlobals($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Role is new, it will return
+     * an empty collection; or if this Role has previously
+     * been saved, it will retrieve related AssignedRoleGlobals from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Role.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildAssignedRoleGlobal[] List of ChildAssignedRoleGlobal objects
+     */
+    public function getAssignedRoleGlobalsJoinassignedBy(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAssignedRoleGlobalQuery::create(null, $criteria);
+        $query->joinWith('assignedBy', $joinBehavior);
+
+        return $this->getAssignedRoleGlobals($query, $con);
     }
 
     /**
@@ -1434,6 +1759,11 @@ abstract class Role implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collAssignedRoleGlobals) {
+                foreach ($this->collAssignedRoleGlobals as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collAssignedRoles) {
                 foreach ($this->collAssignedRoles as $o) {
                     $o->clearAllReferences($deep);
@@ -1441,6 +1771,7 @@ abstract class Role implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collAssignedRoleGlobals = null;
         $this->collAssignedRoles = null;
     }
 

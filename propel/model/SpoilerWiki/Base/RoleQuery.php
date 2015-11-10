@@ -36,6 +36,16 @@ use SpoilerWiki\Map\RoleTableMap;
  * @method     ChildRoleQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildRoleQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
+ * @method     ChildRoleQuery leftJoinAssignedRoleGlobal($relationAlias = null) Adds a LEFT JOIN clause to the query using the AssignedRoleGlobal relation
+ * @method     ChildRoleQuery rightJoinAssignedRoleGlobal($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AssignedRoleGlobal relation
+ * @method     ChildRoleQuery innerJoinAssignedRoleGlobal($relationAlias = null) Adds a INNER JOIN clause to the query using the AssignedRoleGlobal relation
+ *
+ * @method     ChildRoleQuery joinWithAssignedRoleGlobal($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the AssignedRoleGlobal relation
+ *
+ * @method     ChildRoleQuery leftJoinWithAssignedRoleGlobal() Adds a LEFT JOIN clause and with to the query using the AssignedRoleGlobal relation
+ * @method     ChildRoleQuery rightJoinWithAssignedRoleGlobal() Adds a RIGHT JOIN clause and with to the query using the AssignedRoleGlobal relation
+ * @method     ChildRoleQuery innerJoinWithAssignedRoleGlobal() Adds a INNER JOIN clause and with to the query using the AssignedRoleGlobal relation
+ *
  * @method     ChildRoleQuery leftJoinAssignedRole($relationAlias = null) Adds a LEFT JOIN clause to the query using the AssignedRole relation
  * @method     ChildRoleQuery rightJoinAssignedRole($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AssignedRole relation
  * @method     ChildRoleQuery innerJoinAssignedRole($relationAlias = null) Adds a INNER JOIN clause to the query using the AssignedRole relation
@@ -46,7 +56,7 @@ use SpoilerWiki\Map\RoleTableMap;
  * @method     ChildRoleQuery rightJoinWithAssignedRole() Adds a RIGHT JOIN clause and with to the query using the AssignedRole relation
  * @method     ChildRoleQuery innerJoinWithAssignedRole() Adds a INNER JOIN clause and with to the query using the AssignedRole relation
  *
- * @method     \SpoilerWiki\AssignedRoleQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \SpoilerWiki\AssignedRoleGlobalQuery|\SpoilerWiki\AssignedRoleQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildRole findOne(ConnectionInterface $con = null) Return the first ChildRole matching the query
  * @method     ChildRole findOneOrCreate(ConnectionInterface $con = null) Return the first ChildRole matching the query, or a new ChildRole object populated from the query conditions when no match is found
@@ -345,6 +355,79 @@ abstract class RoleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(RoleTableMap::COL_DESCRIPTION, $description, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \SpoilerWiki\AssignedRoleGlobal object
+     *
+     * @param \SpoilerWiki\AssignedRoleGlobal|ObjectCollection $assignedRoleGlobal the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildRoleQuery The current query, for fluid interface
+     */
+    public function filterByAssignedRoleGlobal($assignedRoleGlobal, $comparison = null)
+    {
+        if ($assignedRoleGlobal instanceof \SpoilerWiki\AssignedRoleGlobal) {
+            return $this
+                ->addUsingAlias(RoleTableMap::COL_ID, $assignedRoleGlobal->getUserId(), $comparison);
+        } elseif ($assignedRoleGlobal instanceof ObjectCollection) {
+            return $this
+                ->useAssignedRoleGlobalQuery()
+                ->filterByPrimaryKeys($assignedRoleGlobal->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAssignedRoleGlobal() only accepts arguments of type \SpoilerWiki\AssignedRoleGlobal or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the AssignedRoleGlobal relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildRoleQuery The current query, for fluid interface
+     */
+    public function joinAssignedRoleGlobal($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('AssignedRoleGlobal');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'AssignedRoleGlobal');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the AssignedRoleGlobal relation AssignedRoleGlobal object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \SpoilerWiki\AssignedRoleGlobalQuery A secondary query class using the current class as primary query
+     */
+    public function useAssignedRoleGlobalQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinAssignedRoleGlobal($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AssignedRoleGlobal', '\SpoilerWiki\AssignedRoleGlobalQuery');
     }
 
     /**

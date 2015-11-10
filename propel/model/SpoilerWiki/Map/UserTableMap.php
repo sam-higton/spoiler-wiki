@@ -159,6 +159,20 @@ class UserTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'AuthTokens', false);
+        $this->addRelation('AssignedRoleGlobalRelatedByUserId', '\\SpoilerWiki\\AssignedRoleGlobal', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':user_id',
+    1 => ':id',
+  ),
+), null, null, 'AssignedRoleGlobalsRelatedByUserId', false);
+        $this->addRelation('AssignedRoleGlobalRelatedByAssignedBy', '\\SpoilerWiki\\AssignedRoleGlobal', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':assigned_by',
+    1 => ':id',
+  ),
+), null, null, 'AssignedRoleGlobalsRelatedByAssignedBy', false);
         $this->addRelation('AssignedRoleRelatedByUserId', '\\SpoilerWiki\\AssignedRole', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (

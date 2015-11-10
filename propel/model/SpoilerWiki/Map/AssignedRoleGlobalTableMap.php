@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use SpoilerWiki\Role;
-use SpoilerWiki\RoleQuery;
+use SpoilerWiki\AssignedRoleGlobal;
+use SpoilerWiki\AssignedRoleGlobalQuery;
 
 
 /**
- * This class defines the structure of the 'role' table.
+ * This class defines the structure of the 'assigned_role_global' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use SpoilerWiki\RoleQuery;
  * (i.e. if it's a text column type).
  *
  */
-class RoleTableMap extends TableMap
+class AssignedRoleGlobalTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class RoleTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'SpoilerWiki.Map.RoleTableMap';
+    const CLASS_NAME = 'SpoilerWiki.Map.AssignedRoleGlobalTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class RoleTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'role';
+    const TABLE_NAME = 'assigned_role_global';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\SpoilerWiki\\Role';
+    const OM_CLASS = '\\SpoilerWiki\\AssignedRoleGlobal';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'SpoilerWiki.Role';
+    const CLASS_DEFAULT = 'SpoilerWiki.AssignedRoleGlobal';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,22 +69,27 @@ class RoleTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'role.id';
+    const COL_ID = 'assigned_role_global.id';
 
     /**
-     * the column name for the name field
+     * the column name for the user_id field
      */
-    const COL_NAME = 'role.name';
+    const COL_USER_ID = 'assigned_role_global.user_id';
 
     /**
-     * the column name for the description field
+     * the column name for the role_id field
      */
-    const COL_DESCRIPTION = 'role.description';
+    const COL_ROLE_ID = 'assigned_role_global.role_id';
+
+    /**
+     * the column name for the assigned_by field
+     */
+    const COL_ASSIGNED_BY = 'assigned_role_global.assigned_by';
 
     /**
      * The default string format for model objects of the related table
@@ -98,11 +103,11 @@ class RoleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Description', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'description', ),
-        self::TYPE_COLNAME       => array(RoleTableMap::COL_ID, RoleTableMap::COL_NAME, RoleTableMap::COL_DESCRIPTION, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'description', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'UserId', 'RoleId', 'AssignedBy', ),
+        self::TYPE_CAMELNAME     => array('id', 'userId', 'roleId', 'assignedBy', ),
+        self::TYPE_COLNAME       => array(AssignedRoleGlobalTableMap::COL_ID, AssignedRoleGlobalTableMap::COL_USER_ID, AssignedRoleGlobalTableMap::COL_ROLE_ID, AssignedRoleGlobalTableMap::COL_ASSIGNED_BY, ),
+        self::TYPE_FIELDNAME     => array('id', 'user_id', 'role_id', 'assigned_by', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -112,11 +117,11 @@ class RoleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Description' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'description' => 2, ),
-        self::TYPE_COLNAME       => array(RoleTableMap::COL_ID => 0, RoleTableMap::COL_NAME => 1, RoleTableMap::COL_DESCRIPTION => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'description' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'UserId' => 1, 'RoleId' => 2, 'AssignedBy' => 3, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'userId' => 1, 'roleId' => 2, 'assignedBy' => 3, ),
+        self::TYPE_COLNAME       => array(AssignedRoleGlobalTableMap::COL_ID => 0, AssignedRoleGlobalTableMap::COL_USER_ID => 1, AssignedRoleGlobalTableMap::COL_ROLE_ID => 2, AssignedRoleGlobalTableMap::COL_ASSIGNED_BY => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'user_id' => 1, 'role_id' => 2, 'assigned_by' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -129,16 +134,18 @@ class RoleTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('role');
-        $this->setPhpName('Role');
+        $this->setName('assigned_role_global');
+        $this->setPhpName('AssignedRoleGlobal');
         $this->setIdentifierQuoting(true);
-        $this->setClassName('\\SpoilerWiki\\Role');
+        $this->setClassName('\\SpoilerWiki\\AssignedRoleGlobal');
         $this->setPackage('SpoilerWiki');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
-        $this->addColumn('description', 'Description', 'VARCHAR', false, 255, null);
+        $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'user', 'id', true, null, null);
+        $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'role', 'id', true, null, null);
+        $this->addColumn('role_id', 'RoleId', 'INTEGER', true, null, null);
+        $this->addForeignKey('assigned_by', 'AssignedBy', 'INTEGER', 'user', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -146,20 +153,27 @@ class RoleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AssignedRoleGlobal', '\\SpoilerWiki\\AssignedRoleGlobal', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('user', '\\SpoilerWiki\\User', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':user_id',
     1 => ':id',
   ),
-), null, null, 'AssignedRoleGlobals', false);
-        $this->addRelation('AssignedRole', '\\SpoilerWiki\\AssignedRole', RelationMap::ONE_TO_MANY, array (
+), null, null, null, false);
+        $this->addRelation('assignedBy', '\\SpoilerWiki\\User', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':assigned_by',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('role', '\\SpoilerWiki\\Role', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':user_id',
     1 => ':id',
   ),
-), null, null, 'AssignedRoles', false);
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -219,7 +233,7 @@ class RoleTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? RoleTableMap::CLASS_DEFAULT : RoleTableMap::OM_CLASS;
+        return $withPrefix ? AssignedRoleGlobalTableMap::CLASS_DEFAULT : AssignedRoleGlobalTableMap::OM_CLASS;
     }
 
     /**
@@ -233,22 +247,22 @@ class RoleTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Role object, last column rank)
+     * @return array           (AssignedRoleGlobal object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = RoleTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = RoleTableMap::getInstanceFromPool($key))) {
+        $key = AssignedRoleGlobalTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = AssignedRoleGlobalTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + RoleTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + AssignedRoleGlobalTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = RoleTableMap::OM_CLASS;
-            /** @var Role $obj */
+            $cls = AssignedRoleGlobalTableMap::OM_CLASS;
+            /** @var AssignedRoleGlobal $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            RoleTableMap::addInstanceToPool($obj, $key);
+            AssignedRoleGlobalTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -271,18 +285,18 @@ class RoleTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = RoleTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = RoleTableMap::getInstanceFromPool($key))) {
+            $key = AssignedRoleGlobalTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = AssignedRoleGlobalTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Role $obj */
+                /** @var AssignedRoleGlobal $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                RoleTableMap::addInstanceToPool($obj, $key);
+                AssignedRoleGlobalTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -303,13 +317,15 @@ class RoleTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(RoleTableMap::COL_ID);
-            $criteria->addSelectColumn(RoleTableMap::COL_NAME);
-            $criteria->addSelectColumn(RoleTableMap::COL_DESCRIPTION);
+            $criteria->addSelectColumn(AssignedRoleGlobalTableMap::COL_ID);
+            $criteria->addSelectColumn(AssignedRoleGlobalTableMap::COL_USER_ID);
+            $criteria->addSelectColumn(AssignedRoleGlobalTableMap::COL_ROLE_ID);
+            $criteria->addSelectColumn(AssignedRoleGlobalTableMap::COL_ASSIGNED_BY);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.description');
+            $criteria->addSelectColumn($alias . '.user_id');
+            $criteria->addSelectColumn($alias . '.role_id');
+            $criteria->addSelectColumn($alias . '.assigned_by');
         }
     }
 
@@ -322,7 +338,7 @@ class RoleTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(RoleTableMap::DATABASE_NAME)->getTable(RoleTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(AssignedRoleGlobalTableMap::DATABASE_NAME)->getTable(AssignedRoleGlobalTableMap::TABLE_NAME);
     }
 
     /**
@@ -330,16 +346,16 @@ class RoleTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(RoleTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(RoleTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new RoleTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(AssignedRoleGlobalTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(AssignedRoleGlobalTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new AssignedRoleGlobalTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Role or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a AssignedRoleGlobal or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Role object or primary key or array of primary keys
+     * @param mixed               $values Criteria or AssignedRoleGlobal object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -350,27 +366,27 @@ class RoleTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RoleTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AssignedRoleGlobalTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \SpoilerWiki\Role) { // it's a model object
+        } elseif ($values instanceof \SpoilerWiki\AssignedRoleGlobal) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(RoleTableMap::DATABASE_NAME);
-            $criteria->add(RoleTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(AssignedRoleGlobalTableMap::DATABASE_NAME);
+            $criteria->add(AssignedRoleGlobalTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = RoleQuery::create()->mergeWith($criteria);
+        $query = AssignedRoleGlobalQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            RoleTableMap::clearInstancePool();
+            AssignedRoleGlobalTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                RoleTableMap::removeInstanceFromPool($singleval);
+                AssignedRoleGlobalTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -378,20 +394,20 @@ class RoleTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the role table.
+     * Deletes all rows from the assigned_role_global table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return RoleQuery::create()->doDeleteAll($con);
+        return AssignedRoleGlobalQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Role or Criteria object.
+     * Performs an INSERT on the database, given a AssignedRoleGlobal or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Role object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or AssignedRoleGlobal object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -400,22 +416,22 @@ class RoleTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RoleTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AssignedRoleGlobalTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Role object
+            $criteria = $criteria->buildCriteria(); // build Criteria from AssignedRoleGlobal object
         }
 
-        if ($criteria->containsKey(RoleTableMap::COL_ID) && $criteria->keyContainsValue(RoleTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.RoleTableMap::COL_ID.')');
+        if ($criteria->containsKey(AssignedRoleGlobalTableMap::COL_ID) && $criteria->keyContainsValue(AssignedRoleGlobalTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AssignedRoleGlobalTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = RoleQuery::create()->mergeWith($criteria);
+        $query = AssignedRoleGlobalQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -424,7 +440,7 @@ class RoleTableMap extends TableMap
         });
     }
 
-} // RoleTableMap
+} // AssignedRoleGlobalTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-RoleTableMap::buildTableMap();
+AssignedRoleGlobalTableMap::buildTableMap();
